@@ -106,8 +106,7 @@
             <div class="item-row">
               <span class="item-qty">×${item.qty}</span>
               <span class="item-name">
-                ${CN[item.id] ? `<span class="item-cn">${CN[item.id]}</span>` : ""}
-                <span class="item-de">${item.name}</span>
+                ${CN[item.id] ? `<span class="item-cn">${CN[item.id]}</span>` : `<span class="item-cn">${item.name}</span>`}
               </span>
               <span class="item-price">${(item.qty * item.price).toFixed(2)} €</span>
             </div>`).join("")}
