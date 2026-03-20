@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QR-Codes generieren</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: #f5f3ef; color: #1C1A17; padding: 32px 24px; }
@@ -90,7 +90,6 @@ function generate() {
     const card = document.createElement('div');
     card.className = 'qr-card';
 
-    const canvas = document.createElement('canvas');
     const tischDiv = document.createElement('div');
     tischDiv.className = 'tisch';
     tischDiv.textContent = 'Tisch ' + t;
@@ -98,15 +97,19 @@ function generate() {
     urlDiv.className = 'url';
     urlDiv.textContent = url;
 
-    card.appendChild(canvas);
+    const qrDiv = document.createElement('div');
+    card.appendChild(qrDiv);
     card.appendChild(tischDiv);
     card.appendChild(urlDiv);
     grid.appendChild(card);
 
-    QRCode.toCanvas(canvas, url, {
+    new QRCode(qrDiv, {
+      text: url,
       width: 160,
-      margin: 1,
-      color: { dark: '#1C1A17', light: '#FFFFFF' }
+      height: 160,
+      colorDark: '#1C1A17',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
     });
   }
 }
