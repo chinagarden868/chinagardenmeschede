@@ -92,20 +92,6 @@
     renderOrders();
   };
 
-  window.addItem = function(key) {
-    const select = document.getElementById("add-select-" + key);
-    const chosen = MENU_FLAT.find(i => i.id === select.value);
-    if (!chosen) return;
-    const order = localOrders[key];
-    const existing = order.items.find(i => i.id === chosen.id);
-    if (existing) {
-      existing.qty += 1;
-    } else {
-      order.items.push({ id: chosen.id, name: chosen.name, qty: 1, price: chosen.price });
-    }
-    renderOrders();
-  };
-
   function renderOrders() {
     const orders = Object.values(localOrders)
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
@@ -131,10 +117,6 @@
         ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" })
         : "–";
 
-      const menuOptions = MENU_FLAT.map(i =>
-        `<option value="${i.id}">${i.name} (${i.price.toFixed(2)} €)</option>`
-      ).join("");
-
       return `
       <div class="order-card">
         <div class="card-head">
@@ -158,10 +140,7 @@
               <span class="item-price">${(item.qty * item.price).toFixed(2)} €</span>
             </div>`).join("")}
         </div>
-        <div class="add-row">
-          <select id="add-select-${order.key}" class="add-select">${menuOptions}</select>
-          <button class="add-btn" onclick="addItem('${order.key}')">+ Hinzufügen</button>
-        </div>
+
         <div class="card-foot">
           <span class="total">Gesamt: ${total} €</span>
           <div class="foot-btns">
@@ -340,10 +319,6 @@ header {
 .item-qty { font-size: 15px; font-weight: 500; color: var(--gold); min-width: 20px; text-align: center; }
 .item-name { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.4; }
 .item-price { font-size: 14px; color: var(--muted); white-space: nowrap; }
-.add-row { display: flex; gap: 8px; padding: 10px 20px; border-top: 1px dashed var(--border); }
-.add-select { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--ink); border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
-.add-btn { background: var(--surface2); border: 1px solid var(--gold-dim); color: var(--gold); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; }
-.add-btn:active { opacity: 0.7; }
 .card-foot { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 18px; border-top: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
 .total { font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--gold-l); font-weight: 600; }
 .foot-btns { display: flex; gap: 8px; }
