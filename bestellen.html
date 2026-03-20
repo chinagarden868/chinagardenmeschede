@@ -14,13 +14,13 @@
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey:            "Reminder_anYola_Einfügen",
-    authDomain:        "Reminder_anYola_Einfügen.firebaseapp.com",
-    databaseURL:       "https://Reminder_anYola_Einfügen-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId:         "Reminder_anYola_Einfügen",
-    storageBucket:     "Reminder_anYola_Einfügen",
-    messagingSenderId: "Reminder_anYola_Einfügen",
-    appId:             "Reminder_anYola_Einfügen"
+    apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
+    authDomain:        "china-garden-meschede.firebaseapp.com",
+    databaseURL:       "https://china-garden-meschede-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "china-garden-meschede",
+    storageBucket:     "china-garden-meschede.firebasestorage.app",
+    messagingSenderId: "437982133482",
+    appId:             "1:437982133482:web:135c01db3a84e2b5feab93"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -193,6 +193,7 @@ header h1 {
 }
 .item-info { flex: 1; min-width: 0; }
 .item-name { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+.item-cn   { font-family: 'Noto Serif SC', serif; font-size: 15px; color: var(--gold); margin-top: 2px; letter-spacing: 0.05em; }
 .item-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
 .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; }
 .item-price { font-size: 13px; font-weight: 500; color: var(--red); white-space: nowrap; }
@@ -289,136 +290,136 @@ header h1 {
 const MENU = [
 
   // Mittagsmenü (Mo-Sa 11:30–15:00)
-  { id:"T1",  cat:"Mittagsmenü",  name:"T1. Gebr. Eiernudeln",               desc:"mit Hühnerfleisch und Gemüse",                    price:6.90 },
-  { id:"T2",  cat:"Mittagsmenü",  name:"T2. Gebr. Eierreis",                  desc:"mit Gemüse (vegetarisch)",                       price:6.90 },
-  { id:"T3",  cat:"Mittagsmenü",  name:"T3. Hühnerfleisch Chop-Suey",         desc:"mit Gemüse",                                      price:8.00 },
-  { id:"T4",  cat:"Mittagsmenü",  name:"T4. Hühnerfleisch nach Sichuan-Art",  desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.00 },
-  { id:"T5",  cat:"Mittagsmenü",  name:"T5. Hühnerfleisch mit Curry",         desc:"mit Gemüse und Curry",                            price:8.00 },
-  { id:"T6",  cat:"Mittagsmenü",  name:"T6. Schweinefleisch Chop-Suey",       desc:"mit Gemüse",                                      price:8.00 },
-  { id:"T7",  cat:"Mittagsmenü",  name:"T7. Schweinefleisch Ananas",          desc:"mit Ananas (Süß-Sauer-Soße)",                     price:8.00 },
-  { id:"T8",  cat:"Mittagsmenü",  name:"T8. Schweinefleisch Sichuan-Art",     desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.00 },
-  { id:"T9",  cat:"Mittagsmenü",  name:"T9. Rindfleisch Chop-Suey",           desc:"mit Gemüse",                                      price:8.50 },
-  { id:"T10", cat:"Mittagsmenü",  name:"T10. Rindfleisch Sichuan-Art",        desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.50 },
-  { id:"T11", cat:"Mittagsmenü",  name:"T11. Rindfleisch mit Zwiebeln",       desc:"",                                                price:8.50 },
-  { id:"T12", cat:"Mittagsmenü",  name:"T12. Knusprige Ente",                 desc:"mit Gemüse (Soße zur Auswahl)",                   price:10.90 },
-  { id:"T13", cat:"Mittagsmenü",  name:"T13. Knuspriges Hühnerfleisch",        desc:"mit Gemüse (Soße zur Auswahl)",                   price:8.00 },
-  { id:"T14", cat:"Mittagsmenü",  name:"T14. Panierte Hühnerfilet-Streifen",desc:"mit Gemüse (Soße zur Auswahl)",                  price:8.00 },
-  { id:"T15", cat:"Mittagsmenü",  name:"T15. Gebackenes Fischfilet",          desc:"mit Soße zur Auswahl",                            price:7.50 },
-  { id:"T16", cat:"Mittagsmenü",  name:"T16. Schätze der Natur",              desc:"verschiedenes Gemüse (vegetarisch)",               price:7.50 },
-  { id:"T17", cat:"Mittagsmenü",  name:"T17. Tofu mit Gemüse",                desc:"vegetarisch",                                     price:7.80 },
+  { id:"T1",  cat:"Mittagsmenü",  name:"T1. Gebr. Eiernudeln",               cn:"炒蛋面",         desc:"mit Hühnerfleisch und Gemüse",                    price:6.90 },
+  { id:"T2",  cat:"Mittagsmenü",  name:"T2. Gebr. Eierreis",                  cn:"炒蛋饭",         desc:"mit Gemüse (vegetarisch)",                       price:6.90 },
+  { id:"T3",  cat:"Mittagsmenü",  name:"T3. Hühnerfleisch Chop-Suey",         cn:"杂烩鸡肉",       desc:"mit Gemüse",                                      price:8.00 },
+  { id:"T4",  cat:"Mittagsmenü",  name:"T4. Hühnerfleisch nach Sichuan-Art",  cn:"四川鸡肉",       desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.00 },
+  { id:"T5",  cat:"Mittagsmenü",  name:"T5. Hühnerfleisch mit Curry",         cn:"咖喱鸡肉",       desc:"mit Gemüse und Curry",                            price:8.00 },
+  { id:"T6",  cat:"Mittagsmenü",  name:"T6. Schweinefleisch Chop-Suey",       cn:"杂烩猪肉",       desc:"mit Gemüse",                                      price:8.00 },
+  { id:"T7",  cat:"Mittagsmenü",  name:"T7. Schweinefleisch Ananas",          cn:"菠萝猪肉",       desc:"mit Ananas (Süß-Sauer-Soße)",                     price:8.00 },
+  { id:"T8",  cat:"Mittagsmenü",  name:"T8. Schweinefleisch Sichuan-Art",     cn:"四川猪肉",       desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.00 },
+  { id:"T9",  cat:"Mittagsmenü",  name:"T9. Rindfleisch Chop-Suey",           cn:"杂烩牛肉",       desc:"mit Gemüse",                                      price:8.50 },
+  { id:"T10", cat:"Mittagsmenü",  name:"T10. Rindfleisch Sichuan-Art",        cn:"四川牛肉",       desc:"mit Gemüse (Knoblauch, scharf)",                   price:8.50 },
+  { id:"T11", cat:"Mittagsmenü",  name:"T11. Rindfleisch mit Zwiebeln",       cn:"洋葱牛肉",       desc:"",                                                price:8.50 },
+  { id:"T12", cat:"Mittagsmenü",  name:"T12. Knusprige Ente",                 cn:"脆皮鸭",         desc:"mit Gemüse (Soße zur Auswahl)",                   price:10.90 },
+  { id:"T13", cat:"Mittagsmenü",  name:"T13. Knuspriges Hühnerfleisch",       cn:"脆皮鸡",         desc:"mit Gemüse (Soße zur Auswahl)",                   price:8.00 },
+  { id:"T14", cat:"Mittagsmenü",  name:"T14. Panierte Hühnerfilet-Streifen",  cn:"炸鸡柳",         desc:"mit Gemüse (Soße zur Auswahl)",                  price:8.00 },
+  { id:"T15", cat:"Mittagsmenü",  name:"T15. Gebackenes Fischfilet",          cn:"炸鱼片",         desc:"mit Soße zur Auswahl",                            price:7.50 },
+  { id:"T16", cat:"Mittagsmenü",  name:"T16. Schätze der Natur",              cn:"素什锦",         desc:"verschiedenes Gemüse (vegetarisch)",               price:7.50 },
+  { id:"T17", cat:"Mittagsmenü",  name:"T17. Tofu mit Gemüse",                cn:"豆腐蔬菜",       desc:"vegetarisch",                                     price:7.80 },
 
-  // Suppe für den Fujian-Typen 
-  { id:"1",  cat:"Suppen",  name:"1. Peking-Gulasch-Suppe",    desc:"scharf",                                          price:3.00 },
-  { id:"2",  cat:"Suppen",  name:"2. Eierblumen-Suppe",        desc:"mit Hühnerfleisch",                               price:3.00 },
-  { id:"3",  cat:"Suppen",  name:"3. Wan-Tan Suppe",           desc:"Teigtaschen gefüllt mit Schweinefleisch",         price:3.50 },
-  { id:"4",  cat:"Suppen",  name:"4. Gemüse-Suppe",            desc:"vegetarisch",                                    price:3.00 },
-  { id:"5",  cat:"Suppen",  name:"5. Sam-Sin Suppe",           desc:"Hühner, Krabben, Schrimps mit Gemüse",           price:3.80 },
+  // Suppen
+  { id:"1",  cat:"Suppen",  name:"1. Peking-Gulasch-Suppe",    cn:"北京牛肉汤",     desc:"scharf",                                          price:3.00 },
+  { id:"2",  cat:"Suppen",  name:"2. Eierblumen-Suppe",        cn:"蛋花汤",         desc:"mit Hühnerfleisch",                               price:3.00 },
+  { id:"3",  cat:"Suppen",  name:"3. Wan-Tan Suppe",           cn:"云吞汤",         desc:"Teigtaschen gefüllt mit Schweinefleisch",         price:3.50 },
+  { id:"4",  cat:"Suppen",  name:"4. Gemüse-Suppe",            cn:"蔬菜汤",         desc:"vegetarisch",                                    price:3.00 },
+  { id:"5",  cat:"Suppen",  name:"5. Sam-Sin Suppe",           cn:"三鲜汤",         desc:"Hühner, Krabben, Schrimps mit Gemüse",           price:3.80 },
 
   // Vorspeisen
-  { id:"8",   cat:"Vorspeisen", name:"8. Frühlingsrollen",                   desc:"",                                               price:3.20 },
-  { id:"8a",  cat:"Vorspeisen", name:"8a. Frühlingsrollen (vegetarisch)",   desc:"",                                               price:3.20 },
-  { id:"9",   cat:"Vorspeisen", name:"9. Tsing Dao Mini Frühlingsrolle",    desc:"8 Stück",                                        price:3.20 },
-  { id:"10",  cat:"Vorspeisen", name:"10. Krupuk",                          desc:"Krabbenchips",                                   price:2.50 },
-  { id:"13",  cat:"Vorspeisen", name:"13. Gebackene Garnelen",              desc:"3 Stück mit süß-sauer Soße",                     price:4.50 },
-  { id:"15",  cat:"Vorspeisen", name:"15. Hühnerfleisch Sate",              desc:"2 Spieße mit Erdnuss-Soße",                      price:3.50 },
-  { id:"16",  cat:"Vorspeisen", name:"16. Mix-Platte für 2 Personen",       desc:"2 Sate, 4 Mini-Frühlingsrollen, 2 Garnelen, 2 Krupuk mit süß-saurer Soße", price:6.80 },
+  { id:"8",   cat:"Vorspeisen", name:"8. Frühlingsrollen",                   cn:"春卷",           desc:"",                                               price:3.20 },
+  { id:"8a",  cat:"Vorspeisen", name:"8a. Frühlingsrollen (vegetarisch)",    cn:"素春卷",         desc:"",                                               price:3.20 },
+  { id:"9",   cat:"Vorspeisen", name:"9. Tsing Dao Mini Frühlingsrolle",     cn:"青岛小春卷",     desc:"8 Stück",                                        price:3.20 },
+  { id:"10",  cat:"Vorspeisen", name:"10. Krupuk",                           cn:"虾片",           desc:"Krabbenchips",                                   price:2.50 },
+  { id:"13",  cat:"Vorspeisen", name:"13. Gebackene Garnelen",               cn:"炸虾",           desc:"3 Stück mit süß-sauer Soße",                     price:4.50 },
+  { id:"15",  cat:"Vorspeisen", name:"15. Hühnerfleisch Sate",               cn:"鸡肉沙爹",       desc:"2 Spieße mit Erdnuss-Soße",                      price:3.50 },
+  { id:"16",  cat:"Vorspeisen", name:"16. Mix-Platte für 2 Personen",        cn:"双人拼盘",       desc:"2 Sate, 4 Mini-Frühlingsrollen, 2 Garnelen, 2 Krupuk mit süß-saurer Soße", price:6.80 },
 
   // Salate
-  { id:"12",  cat:"Salate", name:"12. Gemischter Salat",       desc:"Eisberg, Tomaten, Gurken, Sojabohnensprossen, Mais, Oliven – mit Essig-Öl oder Joghurt Dressing", price:3.80 },
-  { id:"14",  cat:"Salate", name:"14. Hühnerfleisch-Salat",    desc:"Eisbergsalat, Hühnerfleisch, Sojabohnensprossen, Gurken, Tomaten, Oliven",                        price:5.20 },
-  { id:"17",  cat:"Salate", name:"17. Krabben-Salat",          desc:"Eisbergsalat, Sojasprossen, Krabben, Gurken, Tomaten, Oliven",                                    price:6.80 },
+  { id:"12",  cat:"Salate", name:"12. Gemischter Salat",       cn:"什锦沙拉",       desc:"Eisberg, Tomaten, Gurken, Sojabohnensprossen, Mais, Oliven – mit Essig-Öl oder Joghurt Dressing", price:3.80 },
+  { id:"14",  cat:"Salate", name:"14. Hühnerfleisch-Salat",    cn:"鸡肉沙拉",       desc:"Eisbergsalat, Hühnerfleisch, Sojabohnensprossen, Gurken, Tomaten, Oliven",                        price:5.20 },
+  { id:"17",  cat:"Salate", name:"17. Krabben-Salat",          cn:"蟹肉沙拉",       desc:"Eisbergsalat, Sojasprossen, Krabben, Gurken, Tomaten, Oliven",                                    price:6.80 },
 
   // Hühnerfleisch
-  { id:"19", cat:"Hühnerfleisch", name:"19. Hühnerfleisch Chop-Suey",          desc:"mit verschiedene Gemüse",                          price:12.20 },
-  { id:"20", cat:"Hühnerfleisch", name:"20. Hühnerfleisch Sa-Za",              desc:"mit Gemüse und Sa-za Gewürz, Knoblauch, leicht scharf", price:12.20 },
-  { id:"21", cat:"Hühnerfleisch", name:"21. Hühnerfleisch Gong Bao",           desc:"mit Gurke, Paprika, Karoten, Porree und Erdnuss (Knoblauch leicht scharf)", price:12.20 },
-  { id:"22", cat:"Hühnerfleisch", name:"22. Hühnerfleisch nach Sichuan-Art",   desc:"mit Zwiebeln, Paprika, Bambus und Champignons",    price:12.20 },
-  { id:"23", cat:"Hühnerfleisch", name:"23. Hühnerfleisch",                    desc:"mit Brokkoli, Karoten und Knoblauch",               price:12.20 },
-  { id:"25", cat:"Hühnerfleisch", name:"25. Paniertes Hühnerfleisch",          desc:"mit Gemüse (süß-sauer leicht scharf Soße)",         price:12.20 },
-  { id:"26", cat:"Hühnerfleisch", name:"26. Hühnerfleisch-Sate (8 Spieße)",   desc:"mit Gemüse (Erdnuss-Soße)",                         price:12.20 },
-  { id:"27", cat:"Hühnerfleisch", name:"27. Gebackene Hühnerfleisch",          desc:"mit Gemüse (Ananas süß-sauer oder Erdnuss Soße)",   price:12.20 },
-  { id:"28", cat:"Hühnerfleisch", name:"28. Gebackene Hühnerfleisch eingelegt",desc:"in Ananas süß-sauer Soße",                          price:12.20 },
+  { id:"19", cat:"Hühnerfleisch", name:"19. Hühnerfleisch Chop-Suey",          cn:"杂烩鸡肉",     desc:"mit verschiedene Gemüse",                          price:12.20 },
+  { id:"20", cat:"Hühnerfleisch", name:"20. Hühnerfleisch Sa-Za",              cn:"沙茶鸡肉",     desc:"mit Gemüse und Sa-za Gewürz, Knoblauch, leicht scharf", price:12.20 },
+  { id:"21", cat:"Hühnerfleisch", name:"21. Hühnerfleisch Gong Bao",           cn:"宫保鸡丁",     desc:"mit Gurke, Paprika, Karoten, Porree und Erdnuss (Knoblauch leicht scharf)", price:12.20 },
+  { id:"22", cat:"Hühnerfleisch", name:"22. Hühnerfleisch nach Sichuan-Art",   cn:"四川鸡肉",     desc:"mit Zwiebeln, Paprika, Bambus und Champignons",    price:12.20 },
+  { id:"23", cat:"Hühnerfleisch", name:"23. Hühnerfleisch",                    cn:"西兰花鸡肉",   desc:"mit Brokkoli, Karoten und Knoblauch",               price:12.20 },
+  { id:"25", cat:"Hühnerfleisch", name:"25. Paniertes Hühnerfleisch",          cn:"炸鸡肉",       desc:"mit Gemüse (süß-sauer leicht scharf Soße)",         price:12.20 },
+  { id:"26", cat:"Hühnerfleisch", name:"26. Hühnerfleisch-Sate (8 Spieße)",   cn:"鸡肉沙爹",     desc:"mit Gemüse (Erdnuss-Soße)",                         price:12.20 },
+  { id:"27", cat:"Hühnerfleisch", name:"27. Gebackene Hühnerfleisch",          cn:"甜酸炸鸡",     desc:"mit Gemüse (Ananas süß-sauer oder Erdnuss Soße)",   price:12.20 },
+  { id:"28", cat:"Hühnerfleisch", name:"28. Gebackene Hühnerfleisch eingelegt",cn:"菠萝甜酸鸡",   desc:"in Ananas süß-sauer Soße",                          price:12.20 },
 
   // Enten-Gerichte
-  { id:"32", cat:"Ente", name:"32. Knusprige Ente nach Sichuan-Art",  desc:"mit Gemüse (Knoblauch, leicht scharfe Soße)",    price:13.90 },
-  { id:"33", cat:"Ente", name:"33. Knusprige Ente",                   desc:"mit Gemüse (Ananas Süß-sauer-Soße)",           price:13.90 },
-  { id:"35", cat:"Ente", name:"35. Knusprige Ente nach Kantonesisch", desc:"mit Gemüse (pikante Soße)",                     price:13.90 },
-  { id:"37", cat:"Ente", name:"37. Ba-Bao-Ya knusprige Ente",         desc:"8 Köstlichkeiten (pikante, leicht scharf Soße)", price:14.90 },
-  { id:"38", cat:"Ente", name:"38. Knusprige Ente nach Shanghai-Art", desc:"mit Gemüse (Erdnuss-Soße)",                    price:13.90 },
+  { id:"32", cat:"Ente", name:"32. Knusprige Ente nach Sichuan-Art",  cn:"四川脆皮鸭",   desc:"mit Gemüse (Knoblauch, leicht scharfe Soße)",    price:13.90 },
+  { id:"33", cat:"Ente", name:"33. Knusprige Ente",                   cn:"菠萝脆皮鸭",   desc:"mit Gemüse (Ananas Süß-sauer-Soße)",           price:13.90 },
+  { id:"35", cat:"Ente", name:"35. Knusprige Ente nach Kantonesisch", cn:"广式脆皮鸭",   desc:"mit Gemüse (pikante Soße)",                     price:13.90 },
+  { id:"37", cat:"Ente", name:"37. Ba-Bao-Ya knusprige Ente",         cn:"八宝鸭",       desc:"8 Köstlichkeiten (pikante, leicht scharf Soße)", price:14.90 },
+  { id:"38", cat:"Ente", name:"38. Knusprige Ente nach Shanghai-Art", cn:"上海脆皮鸭",   desc:"mit Gemüse (Erdnuss-Soße)",                    price:13.90 },
 
   // Schweinefleisch
-  { id:"41", cat:"Schweinefleisch", name:"41. Schweinefleisch Chop-Suey",        desc:"mit verschiedene Gemüse",                           price:11.50 },
-  { id:"42", cat:"Schweinefleisch", name:"42. Schweinefleisch nach Sichuan-Art", desc:"mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch leicht scharf)", price:11.50 },
-  { id:"43", cat:"Schweinefleisch", name:"43. Schweinefleisch Sa-Za",            desc:"mit Gemüse und Sa-za Gewürz, leicht scharf Knoblauch", price:11.50 },
-  { id:"46", cat:"Schweinefleisch", name:"46. Gebackenes Schweinefleisch",       desc:"in Ananas, süß-sauer Soße",                          price:11.50 },
-  { id:"47", cat:"Schweinefleisch", name:"47. Acht Köstlichkeiten",              desc:"mit Gemüse, Rindfleisch, Hühnerfleisch, Schweinefleisch und Garnelen (leicht scharf)", price:13.50 },
+  { id:"41", cat:"Schweinefleisch", name:"41. Schweinefleisch Chop-Suey",        cn:"杂烩猪肉",   desc:"mit verschiedene Gemüse",                           price:11.50 },
+  { id:"42", cat:"Schweinefleisch", name:"42. Schweinefleisch nach Sichuan-Art", cn:"四川猪肉",   desc:"mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch leicht scharf)", price:11.50 },
+  { id:"43", cat:"Schweinefleisch", name:"43. Schweinefleisch Sa-Za",            cn:"沙茶猪肉",   desc:"mit Gemüse und Sa-za Gewürz, leicht scharf Knoblauch", price:11.50 },
+  { id:"46", cat:"Schweinefleisch", name:"46. Gebackenes Schweinefleisch",       cn:"甜酸炸猪肉", desc:"in Ananas, süß-sauer Soße",                          price:11.50 },
+  { id:"47", cat:"Schweinefleisch", name:"47. Acht Köstlichkeiten",              cn:"八宝什锦",   desc:"mit Gemüse, Rindfleisch, Hühnerfleisch, Schweinefleisch und Garnelen (leicht scharf)", price:13.50 },
 
-  // ── Rindfleisch 
-  { id:"50", cat:"Rindfleisch", name:"50. Rindfleisch Sa-Za",           desc:"mit Gemüse und Sa-za Gewürz, Knoblauch leicht scharf", price:12.50 },
-  { id:"51", cat:"Rindfleisch", name:"51. Rindfleisch Chop-Suey",       desc:"mit verschiedene Gemüse",                             price:12.50 },
-  { id:"52", cat:"Rindfleisch", name:"52. Rindfleisch nach Sichuan-Art",desc:"mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch leicht scharf)", price:12.50 },
-  { id:"53", cat:"Rindfleisch", name:"53. Rindfleisch",                  desc:"mit Zwiebeln, Porree und Karoten",                    price:12.50 },
-  { id:"54", cat:"Rindfleisch", name:"54. Rindfleisch",                  desc:"mit Brokkoli, Karoten und Knoblauch",                 price:12.50 },
-  { id:"56", cat:"Rindfleisch", name:"56. Rindfleisch",                  desc:"mit schwarze Bohnen Gewürz, Bambus, Paprika, Zwiebeln und Porree (leicht scharf)", price:12.50 },
+  // Rindfleisch
+  { id:"50", cat:"Rindfleisch", name:"50. Rindfleisch Sa-Za",           cn:"沙茶牛肉",   desc:"mit Gemüse und Sa-za Gewürz, Knoblauch leicht scharf", price:12.50 },
+  { id:"51", cat:"Rindfleisch", name:"51. Rindfleisch Chop-Suey",       cn:"杂烩牛肉",   desc:"mit verschiedene Gemüse",                             price:12.50 },
+  { id:"52", cat:"Rindfleisch", name:"52. Rindfleisch nach Sichuan-Art",cn:"四川牛肉",   desc:"mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch leicht scharf)", price:12.50 },
+  { id:"53", cat:"Rindfleisch", name:"53. Rindfleisch",                  cn:"洋葱牛肉",   desc:"mit Zwiebeln, Porree und Karoten",                    price:12.50 },
+  { id:"54", cat:"Rindfleisch", name:"54. Rindfleisch",                  cn:"西兰花牛肉", desc:"mit Brokkoli, Karoten und Knoblauch",                 price:12.50 },
+  { id:"56", cat:"Rindfleisch", name:"56. Rindfleisch",                  cn:"黑豆牛肉",   desc:"mit schwarze Bohnen Gewürz, Bambus, Paprika, Zwiebeln und Porree (leicht scharf)", price:12.50 },
 
-  // ── Curry-Gerichte ───────────────────────────
-  { id:"57", cat:"Curry", name:"57. Rindfleisch mit Curry",      desc:"mit Gemüse und Curry",  price:12.50 },
-  { id:"58", cat:"Curry", name:"58. Schweinefleisch mit Curry",  desc:"mit Gemüse und Curry",  price:11.50 },
-  { id:"59", cat:"Curry", name:"59. Hühnerfleisch mit Curry",    desc:"mit Gemüse und Curry",  price:12.20 },
-  { id:"60", cat:"Curry", name:"60. Garnelen mit Curry",         desc:"mit Gemüse und Curry",  price:16.90 },
-  { id:"61", cat:"Curry", name:"61. Nasi-Goreng Eierreis",       desc:"mit Gemüse, Hühnerfleisch, Schinken, Schrimps und Curry", price:11.50 },
-  { id:"62", cat:"Curry", name:"62. Bami-Goreng Eiernudeln",     desc:"mit Gemüse, Hühnerfleisch, Schinken, Shrimps und Curry", price:11.50 },
+  // Curry-Gerichte
+  { id:"57", cat:"Curry", name:"57. Rindfleisch mit Curry",      cn:"咖喱牛肉",   desc:"mit Gemüse und Curry",  price:12.50 },
+  { id:"58", cat:"Curry", name:"58. Schweinefleisch mit Curry",  cn:"咖喱猪肉",   desc:"mit Gemüse und Curry",  price:11.50 },
+  { id:"59", cat:"Curry", name:"59. Hühnerfleisch mit Curry",    cn:"咖喱鸡肉",   desc:"mit Gemüse und Curry",  price:12.20 },
+  { id:"60", cat:"Curry", name:"60. Garnelen mit Curry",         cn:"咖喱虾",     desc:"mit Gemüse und Curry",  price:16.90 },
+  { id:"61", cat:"Curry", name:"61. Nasi-Goreng Eierreis",       cn:"印尼炒饭",   desc:"mit Gemüse, Hühnerfleisch, Schinken, Schrimps und Curry", price:11.50 },
+  { id:"62", cat:"Curry", name:"62. Bami-Goreng Eiernudeln",     cn:"印尼炒面",   desc:"mit Gemüse, Hühnerfleisch, Schinken, Shrimps und Curry", price:11.50 },
 
-  // ── Meeresfrüchte ────────────────────────────
-  { id:"63", cat:"Meeresfrüchte", name:"63. Gebackenes Fischfilet",              desc:"mit Gemüse (süß-sauer Soße)",                          price:10.90 },
-  { id:"66", cat:"Meeresfrüchte", name:"66. Tintenfisch",                        desc:"mit schwarzen Bohnen und Gemüse (leicht scharf)",       price:14.80 },
-  { id:"71", cat:"Meeresfrüchte", name:"71. Gebr. Garnelen mit Schale (10 St.)", desc:"mit verschiedene Gemüse und süßer Chilisauce",          price:16.90 },
-  { id:"72", cat:"Meeresfrüchte", name:"72. Gebr. Garnelen nach Gong Bao Art",   desc:"mit Zwiebeln, Paprika, Champignons, Bambus (Hoisin-Sauce, leicht scharf)", price:16.90 },
-  { id:"73", cat:"Meeresfrüchte", name:"73. Knusprige Gebackene Garnelen (8 St.)",desc:"mit Gemüse (süß-sauer Soße)",                          price:12.00 },
-  { id:"77", cat:"Meeresfrüchte", name:"77. Gebr. Garnelen mit Gemüse",          desc:"",                                                      price:16.90 },
+  // Meeresfrüchte
+  { id:"63", cat:"Meeresfrüchte", name:"63. Gebackenes Fischfilet",              cn:"炸鱼片",       desc:"mit Gemüse (süß-sauer Soße)",                          price:10.90 },
+  { id:"66", cat:"Meeresfrüchte", name:"66. Tintenfisch",                        cn:"黑豆鱿鱼",     desc:"mit schwarzen Bohnen und Gemüse (leicht scharf)",       price:14.80 },
+  { id:"71", cat:"Meeresfrüchte", name:"71. Gebr. Garnelen mit Schale (10 St.)", cn:"带壳炒虾",     desc:"mit verschiedene Gemüse und süßer Chilisauce",          price:16.90 },
+  { id:"72", cat:"Meeresfrüchte", name:"72. Gebr. Garnelen nach Gong Bao Art",   cn:"宫保虾",       desc:"mit Zwiebeln, Paprika, Champignons, Bambus (Hoisin-Sauce, leicht scharf)", price:16.90 },
+  { id:"73", cat:"Meeresfrüchte", name:"73. Knusprige Gebackene Garnelen (8 St.)",cn:"炸虾球",      desc:"mit Gemüse (süß-sauer Soße)",                          price:12.00 },
+  { id:"77", cat:"Meeresfrüchte", name:"77. Gebr. Garnelen mit Gemüse",          cn:"炒虾仁",       desc:"",                                                      price:16.90 },
 
-  // ── Vegetarisch 
-  { id:"79", cat:"Vegetarisch", name:"79. Gebratener Eierreis",    desc:"mit Gemüse",                            price:9.00 },
-  { id:"80", cat:"Vegetarisch", name:"80. Gebr. Nudeln mit Gemüse",desc:"",                                       price:9.00 },
-  { id:"81", cat:"Vegetarisch", name:"81. Chop-Suey Tofu",         desc:"Tofu mit verschiedene Gemüse",          price:10.80 },
-  { id:"82", cat:"Vegetarisch", name:"82. Tofu nach Sichuan-Art",  desc:"Tofu mit verschiedene Gemüse, leicht scharf", price:10.80 },
-  { id:"83", cat:"Vegetarisch", name:"83. Schätze der Natur",      desc:"verschiedene Gemüse",                   price:10.50 },
+  // Vegetarisch
+  { id:"79", cat:"Vegetarisch", name:"79. Gebratener Eierreis",    cn:"素炒蛋饭",   desc:"mit Gemüse",                            price:9.00 },
+  { id:"80", cat:"Vegetarisch", name:"80. Gebr. Nudeln mit Gemüse",cn:"素炒面",     desc:"",                                       price:9.00 },
+  { id:"81", cat:"Vegetarisch", name:"81. Chop-Suey Tofu",         cn:"什锦豆腐",   desc:"Tofu mit verschiedene Gemüse",          price:10.80 },
+  { id:"82", cat:"Vegetarisch", name:"82. Tofu nach Sichuan-Art",  cn:"四川豆腐",   desc:"Tofu mit verschiedene Gemüse, leicht scharf", price:10.80 },
+  { id:"83", cat:"Vegetarisch", name:"83. Schätze der Natur",      cn:"大自然珍宝", desc:"verschiedene Gemüse",                   price:10.50 },
 
-  // ── Sushi ──────
-  { id:"S1", cat:"Sushi", name:"S1. Vegetarische Sushi",       desc:"8 Stück",                             price:5.60 },
-  { id:"S2", cat:"Sushi", name:"S2. Meeresfrüchte Sushi",      desc:"6 Stück",                             price:7.90 },
-  { id:"S3", cat:"Sushi", name:"S3. Große Mix Sushi-Teller",   desc:"12 Stück – 6 Vegetarische, 6 Meeresfrüchte", price:12.00 },
+  // Sushi
+  { id:"S1", cat:"Sushi", name:"S1. Vegetarische Sushi",       cn:"素寿司",     desc:"8 Stück",                             price:5.60 },
+  { id:"S2", cat:"Sushi", name:"S2. Meeresfrüchte Sushi",      cn:"海鲜寿司",   desc:"6 Stück",                             price:7.90 },
+  { id:"S3", cat:"Sushi", name:"S3. Große Mix Sushi-Teller",   cn:"什锦寿司拼盘", desc:"12 Stück – 6 Vegetarische, 6 Meeresfrüchte", price:12.00 },
 
-  // ── Kinder-Gerichte ──────────────────────────
-  { id:"K1", cat:"Kinder", name:"K1. Paniertes Hühnerfleisch",      desc:"mit Reis oder Pommes (süß-sauer Soße)",          price:6.50 },
-  { id:"K2", cat:"Kinder", name:"K2. Hühnerfleisch mit Champignons",desc:"mit Reis",                                       price:6.50 },
-  { id:"K3", cat:"Kinder", name:"K3. 3 Mini-Frühlingsrolle + Pommes",desc:"1 Hähnchen Spieß, Mayonnaise, Ketchup",         price:5.00 },
-  { id:"K4", cat:"Kinder", name:"K4. Pommes",                       desc:"mit Ketchup oder Mayonnaise",                    price:2.80 },
-  { id:"K5", cat:"Kinder", name:"K5. Gebr. Eier Nudeln oder Eier Reis",desc:"mit Hühnerfleisch",                          price:6.50 },
+  // Kinder-Gerichte
+  { id:"K1", cat:"Kinder", name:"K1. Paniertes Hühnerfleisch",      cn:"炸鸡肉",     desc:"mit Reis oder Pommes (süß-sauer Soße)",          price:6.50 },
+  { id:"K2", cat:"Kinder", name:"K2. Hühnerfleisch mit Champignons",cn:"蘑菇鸡肉饭", desc:"mit Reis",                                       price:6.50 },
+  { id:"K3", cat:"Kinder", name:"K3. 3 Mini-Frühlingsrolle + Pommes",cn:"迷你春卷套餐",desc:"1 Hähnchen Spieß, Mayonnaise, Ketchup",         price:5.00 },
+  { id:"K4", cat:"Kinder", name:"K4. Pommes",                       cn:"薯条",       desc:"mit Ketchup oder Mayonnaise",                    price:2.80 },
+  { id:"K5", cat:"Kinder", name:"K5. Gebr. Eier Nudeln oder Eier Reis",cn:"炒面或炒饭", desc:"mit Hühnerfleisch",                          price:6.50 },
 
-  // Reis-Gerichte 
-  { id:"85", cat:"Reis & Nudeln", name:"85. Gebratener Eierreis",  desc:"mit Hühnerfleisch und Gemüse",           price:10.50 },
-  { id:"86", cat:"Reis & Nudeln", name:"86. Gebratener Eierreis",  desc:"mit Rindfleisch und Gemüse",             price:10.80 },
-  { id:"87", cat:"Reis & Nudeln", name:"87. Gebratener Eierreis",  desc:"mit Schweinefleisch und Gemüse",         price:10.50 },
-  { id:"88", cat:"Reis & Nudeln", name:"88. Gebratener Eierreis",  desc:"mit Shrimps, Hühnerfleisch, Rindfleisch und Gemüse", price:13.50 },
-  { id:"89", cat:"Reis & Nudeln", name:"89. Gebratener Eierreis",  desc:"mit Gemüse und Ente (pikante Soße)",     price:12.90 },
-  { id:"90", cat:"Reis & Nudeln", name:"90. Gebratener Eierreis",  desc:"mit Gemüse und gebackene Hühnerfleisch (süß-sauer Soße)", price:11.90 },
-  { id:"91", cat:"Reis & Nudeln", name:"91. Gebratene Eiernudeln", desc:"mit Hühnerfleisch und Gemüse",           price:10.50 },
-  { id:"92", cat:"Reis & Nudeln", name:"92. Gebratene Eiernudeln", desc:"mit Rindfleisch und Gemüse",             price:10.80 },
-  { id:"93", cat:"Reis & Nudeln", name:"93. Gebratene Eiernudeln", desc:"mit Schweinefleisch und Gemüse",         price:10.50 },
-  { id:"95", cat:"Reis & Nudeln", name:"95. Gebratene Eiernudeln", desc:"mit Schweine-, Hühner-, Rindfleisch und Gemüse", price:10.80 },
-  { id:"96", cat:"Reis & Nudeln", name:"96. Gebratene Eiernudeln", desc:"mit Garnelen und Gemüse",               price:13.80 },
-  { id:"97", cat:"Reis & Nudeln", name:"97. Gebratene Reisnudeln", desc:"mit Rind-, Hühnerfleisch, Schrimps und Gemüse", price:13.50 },
-  { id:"98", cat:"Reis & Nudeln", name:"98. Gebratene Eiernudeln", desc:"mit Gemüse und gebackene Hühnerfleisch (süß-sauer Soße)", price:11.90 },
-  { id:"99", cat:"Reis & Nudeln", name:"99. Gebratene Eiernudeln", desc:"mit Gemüse und Ente (pikante Soße)",    price:12.90 },
+  // Reis & Nudeln
+  { id:"85", cat:"Reis & Nudeln", name:"85. Gebratener Eierreis",  cn:"鸡肉炒饭",     desc:"mit Hühnerfleisch und Gemüse",           price:10.50 },
+  { id:"86", cat:"Reis & Nudeln", name:"86. Gebratener Eierreis",  cn:"牛肉炒饭",     desc:"mit Rindfleisch und Gemüse",             price:10.80 },
+  { id:"87", cat:"Reis & Nudeln", name:"87. Gebratener Eierreis",  cn:"猪肉炒饭",     desc:"mit Schweinefleisch und Gemüse",         price:10.50 },
+  { id:"88", cat:"Reis & Nudeln", name:"88. Gebratener Eierreis",  cn:"什锦炒饭",     desc:"mit Shrimps, Hühnerfleisch, Rindfleisch und Gemüse", price:13.50 },
+  { id:"89", cat:"Reis & Nudeln", name:"89. Gebratener Eierreis",  cn:"鸭肉炒饭",     desc:"mit Gemüse und Ente (pikante Soße)",     price:12.90 },
+  { id:"90", cat:"Reis & Nudeln", name:"90. Gebratener Eierreis",  cn:"甜酸鸡炒饭",   desc:"mit Gemüse und gebackene Hühnerfleisch (süß-sauer Soße)", price:11.90 },
+  { id:"91", cat:"Reis & Nudeln", name:"91. Gebratene Eiernudeln", cn:"鸡肉炒面",     desc:"mit Hühnerfleisch und Gemüse",           price:10.50 },
+  { id:"92", cat:"Reis & Nudeln", name:"92. Gebratene Eiernudeln", cn:"牛肉炒面",     desc:"mit Rindfleisch und Gemüse",             price:10.80 },
+  { id:"93", cat:"Reis & Nudeln", name:"93. Gebratene Eiernudeln", cn:"猪肉炒面",     desc:"mit Schweinefleisch und Gemüse",         price:10.50 },
+  { id:"95", cat:"Reis & Nudeln", name:"95. Gebratene Eiernudeln", cn:"什锦炒面",     desc:"mit Schweine-, Hühner-, Rindfleisch und Gemüse", price:10.80 },
+  { id:"96", cat:"Reis & Nudeln", name:"96. Gebratene Eiernudeln", cn:"虾仁炒面",     desc:"mit Garnelen und Gemüse",               price:13.80 },
+  { id:"97", cat:"Reis & Nudeln", name:"97. Gebratene Reisnudeln", cn:"什锦炒米线",   desc:"mit Rind-, Hühnerfleisch, Schrimps und Gemüse", price:13.50 },
+  { id:"98", cat:"Reis & Nudeln", name:"98. Gebratene Eiernudeln", cn:"甜酸鸡炒面",   desc:"mit Gemüse und gebackene Hühnerfleisch (süß-sauer Soße)", price:11.90 },
+  { id:"99", cat:"Reis & Nudeln", name:"99. Gebratene Eiernudeln", cn:"鸭肉炒面",     desc:"mit Gemüse und Ente (pikante Soße)",    price:12.90 },
 
   // Desserts
-  { id:"D1", cat:"Desserts", name:"D1. Lychee Früchte",              desc:"",                          price:2.80 },
-  { id:"D2", cat:"Desserts", name:"D2. Götterspeise",                desc:"mit Vanille Soße",          price:3.80 },
-  { id:"D3", cat:"Desserts", name:"D3. Gebackene Banane mit Honig",  desc:"",                          price:3.00 },
-  { id:"D5", cat:"Desserts", name:"D5. Gebackene Ananas mit Honig",  desc:"",                          price:3.00 },
-  { id:"D6", cat:"Desserts", name:"D6. Obst Salat",                  desc:"",                          price:4.50 },
-  { id:"D7", cat:"Desserts", name:"D7. Verschiedene 3 Kugeln Eis",   desc:"",                          price:3.50 },
+  { id:"D1", cat:"Desserts", name:"D1. Lychee Früchte",              cn:"荔枝",       desc:"",                          price:2.80 },
+  { id:"D2", cat:"Desserts", name:"D2. Götterspeise",                cn:"果冻",       desc:"mit Vanille Soße",          price:3.80 },
+  { id:"D3", cat:"Desserts", name:"D3. Gebackene Banane mit Honig",  cn:"蜜糖炸香蕉", desc:"",                          price:3.00 },
+  { id:"D5", cat:"Desserts", name:"D5. Gebackene Ananas mit Honig",  cn:"蜜糖炸菠萝", desc:"",                          price:3.00 },
+  { id:"D6", cat:"Desserts", name:"D6. Obst Salat",                  cn:"水果沙拉",   desc:"",                          price:4.50 },
+  { id:"D7", cat:"Desserts", name:"D7. Verschiedene 3 Kugeln Eis",   cn:"三球冰淇淋", desc:"",                          price:3.50 },
 ];
 
 // Menü aufbauen 
@@ -453,6 +454,7 @@ const MENU = [
       card.innerHTML = `
         <div class="item-info">
           <div class="item-name">${item.name}</div>
+          ${item.cn ? `<div class="item-cn">${item.cn}</div>` : ""}
           ${item.desc ? `<div class="item-desc">${item.desc}</div>` : ""}
         </div>
         <div class="item-right">
