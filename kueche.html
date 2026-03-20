@@ -38,6 +38,31 @@
     renderOrders(orders);
   });
 
+  const CN = {
+    "T1":"炒蛋面","T2":"炒蛋饭","T3":"杂烩鸡肉","T4":"四川鸡肉","T5":"咖喱鸡肉",
+    "T6":"杂烩猪肉","T7":"菠萝猪肉","T8":"四川猪肉","T9":"杂烩牛肉","T10":"四川牛肉",
+    "T11":"洋葱牛肉","T12":"脆皮鸭","T13":"脆皮鸡","T14":"炸鸡柳","T15":"炸鱼片",
+    "T16":"素什锦","T17":"豆腐蔬菜",
+    "1":"北京牛肉汤","2":"蛋花汤","3":"云吞汤","4":"蔬菜汤","5":"三鲜汤",
+    "8":"春卷","8a":"素春卷","9":"青岛小春卷","10":"虾片","13":"炸虾",
+    "15":"鸡肉沙爹","16":"双人拼盘",
+    "12":"什锦沙拉","14":"鸡肉沙拉","17":"蟹肉沙拉",
+    "19":"杂烩鸡肉","20":"沙茶鸡肉","21":"宫保鸡丁","22":"四川鸡肉","23":"西兰花鸡肉",
+    "25":"炸鸡肉","26":"鸡肉沙爹","27":"甜酸炸鸡","28":"菠萝甜酸鸡",
+    "32":"四川脆皮鸭","33":"菠萝脆皮鸭","35":"广式脆皮鸭","37":"八宝鸭","38":"上海脆皮鸭",
+    "41":"杂烩猪肉","42":"四川猪肉","43":"沙茶猪肉","46":"甜酸炸猪肉","47":"八宝什锦",
+    "50":"沙茶牛肉","51":"杂烩牛肉","52":"四川牛肉","53":"洋葱牛肉","54":"西兰花牛肉","56":"黑豆牛肉",
+    "57":"咖喱牛肉","58":"咖喱猪肉","59":"咖喱鸡肉","60":"咖喱虾","61":"印尼炒饭","62":"印尼炒面",
+    "63":"炸鱼片","66":"黑豆鱿鱼","71":"带壳炒虾","72":"宫保虾","73":"炸虾球","77":"炒虾仁",
+    "79":"素炒蛋饭","80":"素炒面","81":"什锦豆腐","82":"四川豆腐","83":"大自然珍宝",
+    "S1":"素寿司","S2":"海鲜寿司","S3":"什锦寿司拼盘",
+    "K1":"炸鸡肉","K2":"蘑菇鸡肉饭","K3":"迷你春卷套餐","K4":"薯条","K5":"炒面或炒饭",
+    "85":"鸡肉炒饭","86":"牛肉炒饭","87":"猪肉炒饭","88":"什锦炒饭","89":"鸭肉炒饭",
+    "90":"甜酸鸡炒饭","91":"鸡肉炒面","92":"牛肉炒面","93":"猪肉炒面","95":"什锦炒面",
+    "96":"虾仁炒面","97":"什锦炒米线","98":"甜酸鸡炒面","99":"鸭肉炒面",
+    "D1":"荔枝","D2":"果冻","D3":"蜜糖炸香蕉","D5":"蜜糖炸菠萝","D6":"水果沙拉","D7":"三球冰淇淋"
+  };
+
   window.markFertig = function(key) {
     update(ref(db, "bestellungen/" + key), { status: "fertig" });
   };
@@ -80,7 +105,10 @@
           ${(order.items || []).map(item => `
             <div class="item-row">
               <span class="item-qty">×${item.qty}</span>
-              <span class="item-name">${item.name}</span>
+              <span class="item-name">
+                ${CN[item.id] ? `<span class="item-cn">${CN[item.id]}</span>` : ""}
+                <span class="item-de">${item.name}</span>
+              </span>
               <span class="item-price">${(item.qty * item.price).toFixed(2)} €</span>
             </div>`).join("")}
         </div>
@@ -226,7 +254,9 @@ header {
   font-size: 14px; font-weight: 500; color: var(--red);
   min-width: 28px; flex-shrink: 0;
 }
-.item-name { flex: 1; font-size: 20px; font-weight: 400; color: var(--ink); line-height: 1.4; }
+.item-name { flex: 1; font-size: 20px; font-weight: 400; color: var(--ink); line-height: 1.4; display: flex; flex-direction: column; gap: 2px; }
+.item-cn { font-family: 'Noto Serif SC', serif; font-size: 22px; color: var(--gold-l); letter-spacing: 0.05em; }
+.item-de { font-size: 14px; color: var(--muted); }
 .item-price { font-size: 14px; color: var(--muted); white-space: nowrap; }
 .card-foot {
   display: flex; justify-content: space-between; align-items: center;
