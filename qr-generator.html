@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-Codes generieren</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #f5f3ef; color: #1C1A17; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
+  p  { font-size: 14px; color: #7A7568; margin-bottom: 24px; }
+
+  .config { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 32px; }
+  .config label { font-size: 13px; color: #7A7568; display: block; margin-bottom: 4px; }
+  .config input {
+    padding: 9px 12px; border: 1px solid #D6D0C7; border-radius: 8px;
+    font-size: 14px; font-family: inherit; background: white; color: #1C1A17; width: 280px;
+  }
+  .config input[type=number] { width: 80px; }
+  button {
+    padding: 10px 20px; background: #2D6A4F; color: white;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+  }
+  button:hover { background: #1f4f3a; }
+
+  .print-btn {
+    background: #1C1A17; margin-left: 8px;
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .qr-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #E4DFD6;
+    padding: 20px;
+    text-align: center;
+    break-inside: avoid;
+  }
+
+  .qr-card canvas { margin: 0 auto 12px; display: block; }
+  .qr-card .tisch { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .qr-card .url   { font-size: 10px; color: #7A7568; word-break: break-all; }
+
+  @media print {
+    body { background: white; padding: 10mm; }
+    .config, h1, p, .print-btn { display: none !important; }
+    .qr-card { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<h1>QR-Codes für alle Tische</h1>
+<p>Trage deine Domain ein, wähle die Anzahl Tische und generiere die QR-Codes zum Ausdrucken.</p>
+
+<div class="config">
+  <div>
+    <label>Deine Domain (ohne /)</label>
+    <input type="text" id="domain" value="https://deinrestaurant.de" placeholder="https://deinrestaurant.de">
+  </div>
+  <div>
+    <label>Anzahl Tische</label>
+    <input type="number" id="count" value="10" min="1" max="50">
+  </div>
+  <div style="padding-bottom:1px">
+    <button onclick="generate()">Generieren</button>
+    <button class="print-btn" onclick="window.print()">Drucken</button>
+  </div>
+</div>
+
+<div id="grid"></div>
+
+<script>
+function generate() {
+  const domain = document.getElementById('domain').value.replace(/\/$/, '');
+  const count  = parseInt(document.getElementById('count').value) || 10;
+  const grid   = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  for (let t = 1; t <= count; t++) {
+    const url  = `${domain}/bestellen.html?tisch=${t}`;
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+
+    const canvas = document.createElement('canvas');
+    card.appendChild(canvas);
+    card.innerHTML += `<div class="tisch">Tisch ${t}</div><div class="url">${url}</div>`;
+    grid.appendChild(card);
+
+    QRCode.toCanvas(canvas, url, {
+      width: 160,
+      margin: 1,
+      color: { dark: '#1C1A17', light: '#FFFFFF' }
+    });
+  }
+}
+
+generate();
+</script>
+</body>
+</html>
