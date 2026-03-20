@@ -26,7 +26,7 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  // Für Buffet 
+  // Buffet - Nachfüllen
   onValue(ref(db, "buffet"), snapshot => {
     const data = snapshot.val() || {};
     const requests = Object.entries(data)
@@ -42,25 +42,32 @@
 
   function renderBuffet(requests) {
     const section = document.getElementById("buffet-section");
-    const list    = document.getElementById("buffet-list");
     const badge   = document.getElementById("buffet-badge");
 
     badge.textContent = requests.length;
     badge.style.display = requests.length > 0 ? "flex" : "none";
     section.style.display = requests.length > 0 ? "block" : "none";
 
-    list.innerHTML = requests.map(r => {
-      const levelColor = r.level === "大量" ? "#C0152A" : r.level === "中量" ? "#C9982A" : "#3A8C5C";
-      return `
-      <div class="buffet-card">
-        <div class="buffet-name">${r.name}</div>
-        <div class="buffet-level" style="color:${levelColor}">${r.level}</div>
-        <button class="buffet-done" onclick="markBuffetFertig('${r.key}')">✓</button>
-      </div>`;
-    }).join("");
+    const gebraten  = requests.filter(r => r.cat !== "frittiert");
+    const frittiert = requests.filter(r => r.cat === "frittiert");
+
+    function makeCards(list) {
+      return list.map(r => {
+        const levelColor = r.level === "大量" ? "#C0152A" : r.level === "中量" ? "#C9982A" : "#3A8C5C";
+        return `
+        <div class="buffet-card">
+          <div class="buffet-name">${r.name}</div>
+          <div class="buffet-level" style="color:${levelColor}">${r.level}</div>
+          <button class="buffet-done" onclick="markBuffetFertig('${r.key}')">✓</button>
+        </div>`;
+      }).join("");
+    }
+
+    document.getElementById("buffet-gebraten").innerHTML = makeCards(gebraten);
+    document.getElementById("buffet-frittiert").innerHTML = makeCards(frittiert);
   }
 
-  // A-la-Carte
+  // Kunden
   onValue(ref(db, "bestellungen"), snapshot => {
     const data = snapshot.val() || {};
     const orders = Object.entries(data)
@@ -236,9 +243,10 @@ header {
   width: 24px; height: 24px; border-radius: 50%;
   font-size: 13px; align-items: center; justify-content: center;
 }
-#buffet-list {
-  display: flex; flex-wrap: wrap; gap: 10px;
-}
+.buffet-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.buffet-col { background: var(--surface2); border-radius: 10px; padding: 10px; }
+.buffet-col-title { font-family: 'Noto Serif SC', serif; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.buffet-list { display: flex; flex-direction: column; gap: 8px; }
 .buffet-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 10px; padding: 10px 14px;
@@ -353,7 +361,7 @@ header {
     <span class="h-icon">🍜</span>
     <div class="h-titles">
       <div class="h-cn">厨房</div>
-      <div class="h-de">Bestellungen</div>
+      <div class="h-de">Küchen-Dashboard</div>
     </div>
   </div>
   <div class="header-right">
@@ -370,11 +378,20 @@ header {
     🍽 自助餐
     <span id="buffet-badge"></span>
   </div>
-  <div id="buffet-list"></div>
+  <div class="buffet-cols">
+    <div class="buffet-col">
+      <div class="buffet-col-title"> 炒菜</div>
+      <div id="buffet-gebraten" class="buffet-list"></div>
+    </div>
+    <div class="buffet-col">
+      <div class="buffet-col-title"> 炸菜 </div>
+      <div id="buffet-frittiert" class="buffet-list"></div>
+    </div>
+  </div>
 </div>
 
 <div id="empty-state">
-  <div class="empty-char">无 - 可以休息一会 :D</div>
+  <div class="empty-char"> 无 - 可以休息一会 :D </div>
   <div class="empty-text">Gerade keine offenen Bestellungen - Etwas ausruhen :D </div>
   <div class="empty-sub">Neue Bestellungen erscheinen hier :) </div>
 </div>
