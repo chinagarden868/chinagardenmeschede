@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>收银台 · Kasse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
+    authDomain:        "china-garden-meschede.firebaseapp.com",
+    databaseURL:       "https://china-garden-meschede-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "china-garden-meschede",
+    storageBucket:     "china-garden-meschede.firebasestorage.app",
+    messagingSenderId: "437982133482",
+    appId:             "1:437982133482:web:135c01db3a84e2b5feab93"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // Lokale Kopie aller Bestellungen zum Bearbeiten
+  let localOrders = {};
+
+  onValue(ref(db, "bestellungen"), snapshot => {
+    const data = snapshot.val() || {};
+    // Nur "fertig"-Bestellungen, aber lokale Änderungen behalten
+    Object.entries(data).forEach(([key, val]) => {
+      if (val.status === "fertig") {
+        if (!localOrders[key]) localOrders[key] = { key, ...val };
+      } else {
+        delete localOrders[key];
+      }
+    });
+    renderOrders();
+  });
+
+  window.markBezahlt = function(key) {
+    update(ref(db, "bestellungen/" + key), { status: "bezahlt" });
+    delete localOrders[key];
+  };
+
+  window.printOrder = function(key) {
+    const order = localOrders[key];
+    if (!order) return;
+    const total = (order.items || []).reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
+    const time  = order.timestamp
+      ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" })
+      : "–";
+    const win = window.open("", "_blank", "width=400,height=600");
+    win.document.write(`
+      <html><head><title>Rechnung Tisch ${order.tisch}</title>
+      <style>
+        body { font-family: monospace; padding: 20px; font-size: 14px; }
+        h2   { text-align: center; margin-bottom: 4px; }
+        .sub { text-align: center; color: #666; margin-bottom: 16px; font-size: 12px; }
+        hr   { border: none; border-top: 1px dashed #ccc; margin: 12px 0; }
+        .row { display: flex; justify-content: space-between; margin: 6px 0; }
+        .total { font-weight: bold; font-size: 16px; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #888; }
+      </style></head><body>
+      <h2>China Garden Meschede</h2>
+      <div class="sub">Tisch ${order.tisch} · ${time} Uhr</div>
+      <hr>
+      ${(order.items || []).map(i => `
+        <div class="row">
+          <span>${i.qty}× ${i.name}</span>
+          <span>${(i.qty * i.price).toFixed(2)} €</span>
+        </div>`).join("")}
+      <hr>
+      <div class="row total"><span>Gesamt</span><span>${total} €</span></div>
+      <div class="footer">Vielen Dank · 谢谢！</div>
+      <script>window.onload=()=>{ window.print(); window.close(); }<\/script>
+      </body></html>`);
+    win.document.close();
+  };
+
+  window.changeQty = function(key, idx, delta) {
+    const order = localOrders[key];
+    if (!order) return;
+    order.items[idx].qty = Math.max(0, (order.items[idx].qty || 0) + delta);
+    if (order.items[idx].qty === 0) {
+      order.items.splice(idx, 1);
+    }
+    renderOrders();
+  };
+
+  window.addItem = function(key) {
+    const select = document.getElementById("add-select-" + key);
+    const chosen = MENU_FLAT.find(i => i.id === select.value);
+    if (!chosen) return;
+    const order = localOrders[key];
+    const existing = order.items.find(i => i.id === chosen.id);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      order.items.push({ id: chosen.id, name: chosen.name, qty: 1, price: chosen.price });
+    }
+    renderOrders();
+  };
+
+  function renderOrders() {
+    const orders = Object.values(localOrders)
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    const grid  = document.getElementById("orders-grid");
+    const empty = document.getElementById("empty-state");
+    const badge = document.getElementById("count-badge");
+
+    badge.textContent = orders.length;
+    badge.dataset.active = orders.length > 0 ? "1" : "0";
+
+    if (orders.length === 0) {
+      grid.innerHTML = "";
+      empty.style.display = "flex";
+      return;
+    }
+    empty.style.display = "none";
+
+    grid.innerHTML = orders.map(order => {
+      const total = (order.items || [])
+        .reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
+      const time = order.timestamp
+        ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" })
+        : "–";
+
+      const menuOptions = MENU_FLAT.map(i =>
+        `<option value="${i.id}">${i.name} (${i.price.toFixed(2)} €)</option>`
+      ).join("");
+
+      return `
+      <div class="order-card">
+        <div class="card-head">
+          <div>
+            <div class="tisch-nr">桌 ${order.tisch}</div>
+            <div class="tisch-sub">Tisch ${order.tisch}</div>
+          </div>
+          <div class="head-right">
+            <span class="order-time">🕐 ${time}</span>
+          </div>
+        </div>
+        <div class="items-list">
+          ${(order.items || []).map((item, idx) => `
+            <div class="item-row">
+              <div class="qty-ctrl">
+                <button class="qty-btn" onclick="changeQty('${order.key}',${idx},-1)">−</button>
+                <span class="item-qty">${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty('${order.key}',${idx},+1)">+</button>
+              </div>
+              <span class="item-name">${item.name}</span>
+              <span class="item-price">${(item.qty * item.price).toFixed(2)} €</span>
+            </div>`).join("")}
+        </div>
+        <div class="add-row">
+          <select id="add-select-${order.key}" class="add-select">${menuOptions}</select>
+          <button class="add-btn" onclick="addItem('${order.key}')">+ Hinzufügen</button>
+        </div>
+        <div class="card-foot">
+          <span class="total">Gesamt: ${total} €</span>
+          <div class="foot-btns">
+            <button class="print-btn" onclick="printOrder('${order.key}')">🖨 Drucken</button>
+            <button class="bezahlt-btn" onclick="markBezahlt('${order.key}')">✓ Bezahlt</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+</script>
+
+<script>
+const MENU_FLAT = [
+  { id:"T1",  name:"T1. Gebr. Eiernudeln",                price:6.90 },
+  { id:"T2",  name:"T2. Gebr. Eierreis",                   price:6.90 },
+  { id:"T3",  name:"T3. Hühnerfleisch Chop-Suey",          price:8.00 },
+  { id:"T4",  name:"T4. Hühnerfleisch Sichuan-Art",        price:8.00 },
+  { id:"T5",  name:"T5. Hühnerfleisch mit Curry",          price:8.00 },
+  { id:"T6",  name:"T6. Schweinefleisch Chop-Suey",        price:8.00 },
+  { id:"T7",  name:"T7. Schweinefleisch Ananas",           price:8.00 },
+  { id:"T8",  name:"T8. Schweinefleisch Sichuan-Art",      price:8.00 },
+  { id:"T9",  name:"T9. Rindfleisch Chop-Suey",            price:8.50 },
+  { id:"T10", name:"T10. Rindfleisch Sichuan-Art",         price:8.50 },
+  { id:"T11", name:"T11. Rindfleisch mit Zwiebeln",        price:8.50 },
+  { id:"T12", name:"T12. Knusprige Ente",                  price:10.90 },
+  { id:"T13", name:"T13. Knuspriges Hühnerfleisch",        price:8.00 },
+  { id:"T14", name:"T14. Panierte Hühnerfilet-Streifen",   price:8.00 },
+  { id:"T15", name:"T15. Gebackenes Fischfilet",           price:7.50 },
+  { id:"T16", name:"T16. Schätze der Natur",               price:7.50 },
+  { id:"T17", name:"T17. Tofu mit Gemüse",                 price:7.80 },
+  { id:"1",   name:"1. Peking-Gulasch-Suppe",              price:3.00 },
+  { id:"2",   name:"2. Eierblumen-Suppe",                  price:3.00 },
+  { id:"3",   name:"3. Wan-Tan Suppe",                     price:3.50 },
+  { id:"4",   name:"4. Gemüse-Suppe",                      price:3.00 },
+  { id:"5",   name:"5. Sam-Sin Suppe",                     price:3.80 },
+  { id:"8",   name:"8. Frühlingsrollen",                   price:3.20 },
+  { id:"8a",  name:"8a. Frühlingsrollen vegetarisch",      price:3.20 },
+  { id:"9",   name:"9. Tsing Dao Mini Frühlingsrolle",     price:3.20 },
+  { id:"10",  name:"10. Krupuk",                           price:2.50 },
+  { id:"13",  name:"13. Gebackene Garnelen",               price:4.50 },
+  { id:"15",  name:"15. Hühnerfleisch Sate",               price:3.50 },
+  { id:"16",  name:"16. Mix-Platte für 2 Personen",        price:6.80 },
+  { id:"12",  name:"12. Gemischter Salat",                 price:3.80 },
+  { id:"14",  name:"14. Hühnerfleisch-Salat",              price:5.20 },
+  { id:"17",  name:"17. Krabben-Salat",                    price:6.80 },
+  { id:"19",  name:"19. Hühnerfleisch Chop-Suey",          price:12.20 },
+  { id:"20",  name:"20. Hühnerfleisch Sa-Za",              price:12.20 },
+  { id:"21",  name:"21. Hühnerfleisch Gong Bao",           price:12.20 },
+  { id:"22",  name:"22. Hühnerfleisch Sichuan-Art",        price:12.20 },
+  { id:"23",  name:"23. Hühnerfleisch mit Brokkoli",       price:12.20 },
+  { id:"25",  name:"25. Paniertes Hühnerfleisch",          price:12.20 },
+  { id:"26",  name:"26. Hühnerfleisch-Sate 8 Spieße",      price:12.20 },
+  { id:"27",  name:"27. Gebackene Hühnerfleisch",          price:12.20 },
+  { id:"28",  name:"28. Gebackene Hühnerfleisch eingelegt",price:12.20 },
+  { id:"32",  name:"32. Knusprige Ente Sichuan-Art",       price:13.90 },
+  { id:"33",  name:"33. Knusprige Ente",                   price:13.90 },
+  { id:"35",  name:"35. Knusprige Ente Kantonesisch",      price:13.90 },
+  { id:"37",  name:"37. Ba-Bao-Ya knusprige Ente",         price:14.90 },
+  { id:"38",  name:"38. Knusprige Ente Shanghai-Art",      price:13.90 },
+  { id:"41",  name:"41. Schweinefleisch Chop-Suey",        price:11.50 },
+  { id:"42",  name:"42. Schweinefleisch Sichuan-Art",      price:11.50 },
+  { id:"43",  name:"43. Schweinefleisch Sa-Za",            price:11.50 },
+  { id:"46",  name:"46. Gebackenes Schweinefleisch",       price:11.50 },
+  { id:"47",  name:"47. Acht Köstlichkeiten",              price:13.50 },
+  { id:"50",  name:"50. Rindfleisch Sa-Za",                price:12.50 },
+  { id:"51",  name:"51. Rindfleisch Chop-Suey",            price:12.50 },
+  { id:"52",  name:"52. Rindfleisch Sichuan-Art",          price:12.50 },
+  { id:"53",  name:"53. Rindfleisch mit Zwiebeln",         price:12.50 },
+  { id:"54",  name:"54. Rindfleisch mit Brokkoli",         price:12.50 },
+  { id:"56",  name:"56. Rindfleisch schwarze Bohnen",      price:12.50 },
+  { id:"57",  name:"57. Rindfleisch mit Curry",            price:12.50 },
+  { id:"58",  name:"58. Schweinefleisch mit Curry",        price:11.50 },
+  { id:"59",  name:"59. Hühnerfleisch mit Curry",          price:12.20 },
+  { id:"60",  name:"60. Garnelen mit Curry",               price:16.90 },
+  { id:"61",  name:"61. Nasi-Goreng Eierreis",             price:11.50 },
+  { id:"62",  name:"62. Bami-Goreng Eiernudeln",           price:11.50 },
+  { id:"63",  name:"63. Gebackenes Fischfilet",            price:10.90 },
+  { id:"66",  name:"66. Tintenfisch",                      price:14.80 },
+  { id:"71",  name:"71. Garnelen mit Schale 10 St.",       price:16.90 },
+  { id:"72",  name:"72. Garnelen Gong Bao Art",            price:16.90 },
+  { id:"73",  name:"73. Knusprige Garnelen 8 St.",         price:12.00 },
+  { id:"77",  name:"77. Gebr. Garnelen mit Gemüse",        price:16.90 },
+  { id:"79",  name:"79. Gebratener Eierreis",              price:9.00 },
+  { id:"80",  name:"80. Gebr. Nudeln mit Gemüse",          price:9.00 },
+  { id:"81",  name:"81. Chop-Suey Tofu",                   price:10.80 },
+  { id:"82",  name:"82. Tofu Sichuan-Art",                 price:10.80 },
+  { id:"83",  name:"83. Schätze der Natur",                price:10.50 },
+  { id:"S1",  name:"S1. Vegetarische Sushi",               price:5.60 },
+  { id:"S2",  name:"S2. Meeresfrüchte Sushi",              price:7.90 },
+  { id:"S3",  name:"S3. Große Mix Sushi-Teller",           price:12.00 },
+  { id:"K1",  name:"K1. Paniertes Hühnerfleisch",          price:6.50 },
+  { id:"K2",  name:"K2. Hühnerfleisch mit Champignons",    price:6.50 },
+  { id:"K3",  name:"K3. Mini-Frühlingsrolle + Pommes",     price:5.00 },
+  { id:"K4",  name:"K4. Pommes",                           price:2.80 },
+  { id:"K5",  name:"K5. Gebr. Eier Nudeln oder Reis",      price:6.50 },
+  { id:"85",  name:"85. Gebratener Eierreis Hühnerfleisch",price:10.50 },
+  { id:"86",  name:"86. Gebratener Eierreis Rindfleisch",  price:10.80 },
+  { id:"87",  name:"87. Gebratener Eierreis Schwein",      price:10.50 },
+  { id:"88",  name:"88. Gebratener Eierreis Mix",          price:13.50 },
+  { id:"89",  name:"89. Gebratener Eierreis Ente",         price:12.90 },
+  { id:"90",  name:"90. Gebratener Eierreis süß-sauer",    price:11.90 },
+  { id:"91",  name:"91. Gebratene Eiernudeln Hühnerfleisch",price:10.50 },
+  { id:"92",  name:"92. Gebratene Eiernudeln Rindfleisch", price:10.80 },
+  { id:"93",  name:"93. Gebratene Eiernudeln Schwein",     price:10.50 },
+  { id:"95",  name:"95. Gebratene Eiernudeln Mix",         price:10.80 },
+  { id:"96",  name:"96. Gebratene Eiernudeln Garnelen",    price:13.80 },
+  { id:"97",  name:"97. Gebratene Reisnudeln Mix",         price:13.50 },
+  { id:"98",  name:"98. Gebratene Eiernudeln süß-sauer",   price:11.90 },
+  { id:"99",  name:"99. Gebratene Eiernudeln Ente",        price:12.90 },
+  { id:"D1",  name:"D1. Lychee Früchte",                   price:2.80 },
+  { id:"D2",  name:"D2. Götterspeise",                     price:3.80 },
+  { id:"D3",  name:"D3. Gebackene Banane mit Honig",       price:3.00 },
+  { id:"D5",  name:"D5. Gebackene Ananas mit Honig",       price:3.00 },
+  { id:"D6",  name:"D6. Obst Salat",                       price:4.50 },
+  { id:"D7",  name:"D7. Verschiedene 3 Kugeln Eis",        price:3.50 },
+];
+</script>
+
+<style>
+:root {
+  --bg:       #0E0A08;
+  --surface:  #1A100C;
+  --surface2: #251510;
+  --border:   #3A2018;
+  --gold:     #C9982A;
+  --gold-l:   #F0D080;
+  --gold-dim: rgba(201,152,42,0.3);
+  --red:      #C0152A;
+  --ink:      #F2E8D8;
+  --muted:    #8A7060;
+  --green:    #3A8C5C;
+  --blue:     #2A6A9A;
+  --r: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans SC', sans-serif; background: var(--bg); color: var(--ink); min-height: 100dvh; }
+.top-strip { height: 4px; background: repeating-linear-gradient(90deg, var(--blue) 0,var(--blue) 18px, var(--gold) 18px, var(--gold) 24px); }
+header {
+  background: var(--surface); border-bottom: 1.5px solid var(--gold-dim);
+  padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.h-cn { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 600; color: var(--gold-l); letter-spacing: 0.1em; }
+.h-de { font-size: 13px; color: var(--muted); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+.live-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--green); color: var(--green); font-size: 13px; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+#count-badge {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 500;
+  background: var(--surface2); border: 1.5px solid var(--border); color: var(--muted);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+#count-badge[data-active="1"] { background: var(--blue); border-color: var(--blue); color: white; }
+#empty-state { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 65vh; gap: 16px; text-align: center; }
+.empty-char { font-family: 'Noto Serif SC', serif; font-size: 72px; color: var(--gold); opacity: 0.15; line-height: 1; }
+.empty-text { font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--muted); font-weight: 500; }
+.empty-sub { font-size: 14px; color: var(--muted); opacity: 0.6; }
+#orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; padding: 24px; }
+.order-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 20px 14px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.tisch-nr { font-family: 'Noto Serif SC', serif; font-size: 32px; font-weight: 600; color: var(--gold-l); line-height: 1; }
+.tisch-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.order-time { font-size: 13px; color: var(--muted); }
+.items-list { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+.item-row { display: flex; align-items: center; gap: 10px; }
+.qty-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.qty-btn { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--ink); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.qty-btn:active { opacity: 0.7; }
+.item-qty { font-size: 15px; font-weight: 500; color: var(--gold); min-width: 20px; text-align: center; }
+.item-name { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.4; }
+.item-price { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.add-row { display: flex; gap: 8px; padding: 10px 20px; border-top: 1px dashed var(--border); }
+.add-select { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--ink); border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+.add-btn { background: var(--surface2); border: 1px solid var(--gold-dim); color: var(--gold); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.add-btn:active { opacity: 0.7; }
+.card-foot { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 18px; border-top: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+.total { font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--gold-l); font-weight: 600; }
+.foot-btns { display: flex; gap: 8px; }
+.print-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--ink); padding: 12px 16px; border-radius: 10px; font-size: 16px; cursor: pointer; font-family: inherit; }
+.print-btn:active { opacity: 0.7; }
+.bezahlt-btn { background: linear-gradient(135deg, #1a5a8a, #0f3d5e); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 16px; font-weight: 500; font-family: 'Noto Sans SC', sans-serif; cursor: pointer; }
+.bezahlt-btn:active { transform: scale(0.97); opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="top-strip"></div>
+<header>
+  <div class="header-left">
+    <span style="font-size:26px">💰</span>
+    <div>
+      <div class="h-cn">收银台</div>
+      <div class="h-de">Kasse</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
+    <div id="count-badge" data-active="0">0</div>
+  </div>
+</header>
+
+<div id="empty-state">
+  <div class="empty-char">空</div>
+  <div class="empty-text">Keine offenen Rechnungen</div>
+  <div class="empty-sub">Fertige Bestellungen erscheinen hier automatisch</div>
+</div>
+
+<div id="orders-grid"></div>
+</body>
+</html>
