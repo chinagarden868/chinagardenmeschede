@@ -186,10 +186,10 @@ header { background: var(--surface); border-bottom: 1.5px solid var(--gold-dim);
   <div class="h-sub">点击菜品和分量，发送补充通知到厨房</div>
 </header>
 
-<div class="section-title">🥢 炒菜 · Gebratenes</div>
+<div class="section-title">🥢 炒菜 </div>
 <div class="dishes-grid" id="list-gebraten"></div>
 
-<div class="section-title frittiert">🍤 炸菜 · Frittiertes</div>
+<div class="section-title frittiert">🍤 炸菜 </div>
 <div class="dishes-grid" id="list-frittiert"></div>
 
 <div class="add-section">
@@ -197,8 +197,8 @@ header { background: var(--surface); border-bottom: 1.5px solid var(--gold-dim);
   <div class="add-row">
     <input type="text" id="new-dish" class="add-input" placeholder="菜品名称…" onkeydown="if(event.key==='Enter') addDish()">
     <select id="new-cat" class="cat-select">
-      <option value="gebraten">🥢 炒菜 · Gebraten</option>
-      <option value="frittiert">🍤 炸菜 · Frittiert</option>
+      <option value="gebraten">炒菜/Gebraten</option>
+      <option value="frittiert">炸菜/Frittiert</option>
     </select>
     <button class="add-btn-submit" onclick="addDish()">＋</button>
   </div>
