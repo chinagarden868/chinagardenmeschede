@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自助餐 · Buffet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, remove, onValue, serverTimestamp, set }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
+    authDomain:        "china-garden-meschede.firebaseapp.com",
+    databaseURL:       "https://china-garden-meschede-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "china-garden-meschede",
+    storageBucket:     "china-garden-meschede.firebasestorage.app",
+    messagingSenderId: "437982133482",
+    appId:             "1:437982133482:web:135c01db3a84e2b5feab93"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const DEFAULT_DISHES = [
+    "菜A · Speise A","菜B · Speise B","菜C · Speise C","菜D · Speise D","菜E · Speise E",
+    "菜F · Speise F","菜G · Speise G","菜H · Speise H","菜I · Speise I","菜J · Speise J",
+    "菜K · Speise K","菜L · Speise L","菜M · Speise M","菜N · Speise N","菜O · Speise O",
+    "菜P · Speise P","菜Q · Speise Q","菜R · Speise R","菜S · Speise S","菜T · Speise T",
+    "菜U · Speise U","菜V · Speise V","菜W · Speise W","菜X · Speise X","菜Y · Speise Y",
+    "菜Z · Speise Z","菜27 · Speise 27","菜28 · Speise 28","菜29 · Speise 29","菜30 · Speise 30"
+  ];
+
+  // Live-Sync der Gerichteliste aus Firebase
+  onValue(ref(db, "buffet_dishes"), snapshot => {
+    const data = snapshot.val();
+    if (!data) {
+      // Erste Nutzung: Standardgerichte in Firebase speichern
+      const promises = DEFAULT_DISHES.map(name => push(ref(db, "buffet_dishes"), { name }));
+      Promise.all(promises);
+      return; // onValue wird nochmal aufgerufen sobald Daten da sind
+    }
+    renderDishes(data);
+  });
+
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  function renderDishes(data) {
+    const grid = document.getElementById("main-list");
+    grid.innerHTML = "";
+    Object.entries(data).forEach(([key, val]) => {
+      const name = val.name;
+      const card = document.createElement("div");
+      card.className = "dish-card";
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "delete-btn";
+      delBtn.textContent = "✕";
+      delBtn.onclick = async () => {
+        if (!confirm("删除此菜品？\nDieses Gericht löschen?")) return;
+        await remove(ref(db, "buffet_dishes/" + key));
+      };
+
+      const dishName = document.createElement("div");
+      dishName.className = "dish-name";
+      dishName.textContent = name;
+
+      const levelBtns = document.createElement("div");
+      levelBtns.className = "level-btns";
+
+      [["shao","少","少量"], ["zhong","中","中量"], ["duo","多","大量"]].forEach(([cls, label, level]) => {
+        const btn = document.createElement("button");
+        btn.className = `level-btn ${cls}`;
+        btn.textContent = label;
+        btn.onclick = async () => {
+          btn.disabled = true;
+          try {
+            await push(ref(db, "buffet"), {
+              name, level, status: "neu", timestamp: serverTimestamp()
+            });
+            showToast(`✓ 已发送：${name} · ${level}`);
+          } catch(e) {
+            alert("发送失败: " + e.message);
+          } finally {
+            btn.disabled = false;
+          }
+        };
+        levelBtns.appendChild(btn);
+      });
+
+      card.appendChild(delBtn);
+      card.appendChild(dishName);
+      card.appendChild(levelBtns);
+      grid.appendChild(card);
+    });
+  }
+
+  window.addDish = async function() {
+    const input = document.getElementById("new-dish");
+    const name = input.value.trim();
+    if (!name) return;
+    await push(ref(db, "buffet_dishes"), { name });
+    input.value = "";
+    showToast(`✓ 已添加：${name}`);
+  };
+</script>
+
+<style>
+:root {
+  --bg:      #0E0A08;
+  --surface: #1A100C;
+  --surface2:#251510;
+  --border:  #3A2018;
+  --gold:    #C9982A;
+  --gold-l:  #F0D080;
+  --gold-dim:rgba(201,152,42,0.3);
+  --red:     #C0152A;
+  --ink:     #F2E8D8;
+  --muted:   #8A7060;
+  --green:   #3A8C5C;
+  --r: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--ink);
+  min-height: 100dvh; padding-bottom: 40px;
+}
+.top-strip {
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--red) 0,var(--red) 18px, var(--gold) 18px, var(--gold) 24px);
+}
+header {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--gold-dim);
+  padding: 16px 20px;
+  text-align: center;
+}
+.h-cn {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 28px; font-weight: 600;
+  color: var(--gold-l); letter-spacing: 0.12em;
+}
+.h-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px; color: var(--gold);
+  padding: 20px 20px 10px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.08em;
+}
+
+.dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; padding: 16px;
+}
+
+.dish-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  text-align: center;
+  position: relative;
+}
+.delete-btn {
+  position: absolute; top: 6px; right: 6px;
+  background: transparent; border: none;
+  color: var(--muted); font-size: 13px;
+  cursor: pointer; padding: 2px 5px;
+  border-radius: 4px; line-height: 1;
+}
+.delete-btn:hover { color: var(--red); background: rgba(192,21,42,0.15); }
+.dish-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; color: var(--ink);
+  margin-bottom: 12px; line-height: 1.4;
+}
+.level-btns {
+  display: flex; gap: 6px; justify-content: center;
+}
+.level-btn {
+  flex: 1; padding: 8px 4px;
+  border-radius: 8px; border: none;
+  font-size: 13px; font-weight: 500;
+  font-family: 'Noto Sans SC', sans-serif;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.level-btn:active { transform: scale(0.95); opacity: 0.8; }
+.level-btn.shao  { background: #2D5A3A; color: #7FC99A; }
+.level-btn.zhong { background: #5A4A1A; color: #F0C060; }
+.level-btn.duo   { background: #6A1A1A; color: #F08080; }
+.level-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* Add dish section */
+.add-section {
+  margin: 8px 16px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.add-section label {
+  display: block;
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 8px;
+}
+.add-row {
+  display: flex; gap: 8px;
+}
+.add-input {
+  flex: 1; background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 16px; color: var(--ink);
+  font-family: 'Noto Serif SC', serif;
+}
+.add-input::placeholder { color: var(--muted); }
+.add-input:focus { outline: none; border-color: var(--gold-dim); }
+.add-btn-submit {
+  background: var(--gold);
+  color: #0E0A08; border: none;
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 18px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--green); color: white;
+  padding: 12px 24px; border-radius: 24px;
+  font-size: 15px; font-weight: 500;
+  opacity: 0; transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none; white-space: nowrap;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="top-strip"></div>
+<header>
+  <div class="h-cn">🍽 自助餐补充</div>
+  <div class="h-sub">点击菜品和分量，发送补充通知到厨房</div>
+</header>
+
+<div class="section-title">🍽 自助餐菜品 · Buffetspeisen</div>
+<div class="dishes-grid" id="main-list"></div>
+
+<div class="add-section">
+  <label>添加菜品 · Gericht hinzufügen</label>
+  <div class="add-row">
+    <input type="text" id="new-dish" class="add-input" placeholder="菜品名称…" onkeydown="if(event.key==='Enter') addDish()">
+    <button class="add-btn-submit" onclick="addDish()">＋</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
+</body>
+</html>
