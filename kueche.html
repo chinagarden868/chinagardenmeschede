@@ -7,9 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 
-<!-- ════════════════════════════════════════════
-     FIREBASE CONFIG — gleiche Werte wie bestellen.html
-     ════════════════════════════════════════════ -->
+
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -33,7 +31,7 @@
     const data = snapshot.val() || {};
     const orders = Object.entries(data)
       .map(([key, val]) => ({ key, ...val }))
-      .filter(o => o.status !== "fertig")
+      .filter(o => o.status !== "fertig" && o.status !== "bezahlt")
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
     renderOrders(orders);
   });
