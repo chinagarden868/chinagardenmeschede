@@ -13,7 +13,6 @@
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, update }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
   const firebaseConfig = {
     apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
     authDomain:        "china-garden-meschede.firebaseapp.com",
@@ -27,6 +26,41 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
+  // Für Buffet 
+  onValue(ref(db, "buffet"), snapshot => {
+    const data = snapshot.val() || {};
+    const requests = Object.entries(data)
+      .map(([key, val]) => ({ key, ...val }))
+      .filter(r => r.status === "neu")
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    renderBuffet(requests);
+  });
+
+  window.markBuffetFertig = function(key) {
+    update(ref(db, "buffet/" + key), { status: "erledigt" });
+  };
+
+  function renderBuffet(requests) {
+    const section = document.getElementById("buffet-section");
+    const list    = document.getElementById("buffet-list");
+    const badge   = document.getElementById("buffet-badge");
+
+    badge.textContent = requests.length;
+    badge.style.display = requests.length > 0 ? "flex" : "none";
+    section.style.display = requests.length > 0 ? "block" : "none";
+
+    list.innerHTML = requests.map(r => {
+      const levelColor = r.level === "大量" ? "#C0152A" : r.level === "中量" ? "#C9982A" : "#3A8C5C";
+      return `
+      <div class="buffet-card">
+        <div class="buffet-name">${r.name}</div>
+        <div class="buffet-level" style="color:${levelColor}">${r.level}</div>
+        <button class="buffet-done" onclick="markBuffetFertig('${r.key}')">✓</button>
+      </div>`;
+    }).join("");
+  }
+
+  // A-la-Carte
   onValue(ref(db, "bestellungen"), snapshot => {
     const data = snapshot.val() || {};
     const orders = Object.entries(data)
@@ -190,7 +224,36 @@ header {
   border-color: var(--red);
   color: white;
 }
-#empty-state {
+/* ── Buffet ── */
+#buffet-section { display: none; padding: 16px 24px 0; }
+.buffet-header {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px; color: var(--gold);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+}
+#buffet-badge {
+  display: none; background: var(--red); color: white;
+  width: 24px; height: 24px; border-radius: 50%;
+  font-size: 13px; align-items: center; justify-content: center;
+}
+#buffet-list {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.buffet-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.buffet-name { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--ink); }
+.buffet-level { font-size: 14px; font-weight: 500; }
+.buffet-done {
+  background: var(--green); color: white; border: none;
+  width: 30px; height: 30px; border-radius: 8px;
+  font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+.buffet-done:active { opacity: 0.7; }
+/* ── Ende Buffet ── */
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
   min-height: 65vh; gap: 16px; text-align: center;
@@ -301,6 +364,14 @@ header {
     <div id="count-badge" data-active="0">0</div>
   </div>
 </header>
+
+<div id="buffet-section">
+  <div class="buffet-header">
+    🍽 自助餐补充 · Buffet-Nachfüllung
+    <span id="buffet-badge"></span>
+  </div>
+  <div id="buffet-list"></div>
+</div>
 
 <div id="empty-state">
   <div class="empty-char">無</div>
