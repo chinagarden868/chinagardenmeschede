@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>历史记录 · Bestellverlauf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
+    authDomain:        "china-garden-meschede.firebaseapp.com",
+    databaseURL:       "https://china-garden-meschede-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "china-garden-meschede",
+    storageBucket:     "china-garden-meschede.firebasestorage.app",
+    messagingSenderId: "437982133482",
+    appId:             "1:437982133482:web:135c01db3a84e2b5feab93"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  onValue(ref(db, "bestellungen"), snapshot => {
+    const data = snapshot.val() || {};
+    const now = Date.now();
+    const vor24h = now - 24 * 60 * 60 * 1000;
+
+    const orders = Object.entries(data)
+      .map(([key, val]) => ({ key, ...val }))
+      .filter(o => o.status === "bezahlt" && (o.timestamp || 0) >= vor24h)
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    renderOrders(orders);
+  });
+
+  function renderOrders(orders) {
+    const container = document.getElementById("orders-container");
+    const empty     = document.getElementById("empty-state");
+    const badge     = document.getElementById("count-badge");
+    const totalEl   = document.getElementById("gesamt-umsatz");
+
+    badge.textContent = orders.length;
+    badge.dataset.active = orders.length > 0 ? "1" : "0";
+
+    if (orders.length === 0) {
+      container.innerHTML = "";
+      empty.style.display = "flex";
+      totalEl.textContent = "0,00 €";
+      return;
+    }
+    empty.style.display = "none";
+
+    // Gesamtumsatz berechnen
+    const gesamtUmsatz = orders.reduce((sum, o) =>
+      sum + (o.items || []).reduce((a, i) => a + i.qty * i.price, 0), 0
+    );
+    totalEl.textContent = gesamtUmsatz.toFixed(2).replace(".", ",") + " €";
+
+    container.innerHTML = orders.map(order => {
+      const total = (order.items || [])
+        .reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
+      const time = order.timestamp
+        ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+        : "–";
+      const date = order.timestamp
+        ? new Date(order.timestamp).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })
+        : "–";
+
+      return `
+      <div class="order-card">
+        <div class="card-head">
+          <div>
+            <div class="tisch-nr">桌 ${order.tisch}</div>
+            <div class="tisch-sub">Tisch ${order.tisch}</div>
+          </div>
+          <div class="head-right">
+            <span class="bezahlt-badge">✓ Bezahlt</span>
+            <span class="order-time">${date} · ${time} Uhr</span>
+          </div>
+        </div>
+        <div class="items-list">
+          ${(order.items || []).map(item => `
+            <div class="item-row">
+              <span class="item-qty">×${item.qty}</span>
+              <span class="item-name">${item.name}</span>
+              <span class="item-price">${(item.qty * item.price).toFixed(2).replace(".", ",")} €</span>
+            </div>`).join("")}
+        </div>
+        <div class="card-foot">
+          <span class="total">合计 ${parseFloat(total).toFixed(2).replace(".", ",")} €</span>
+        </div>
+      </div>`;
+    }).join("");
+  }
+</script>
+
+<style>
+:root {
+  --bg:       #0E0A08;
+  --surface:  #1A100C;
+  --surface2: #251510;
+  --border:   #3A2018;
+  --gold:     #C9982A;
+  --gold-l:   #F0D080;
+  --gold-dim: rgba(201,152,42,0.3);
+  --red:      #C0152A;
+  --ink:      #F2E8D8;
+  --muted:    #8A7060;
+  --green:    #3A8C5C;
+  --r: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100dvh;
+  padding-bottom: 40px;
+}
+.top-strip {
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--green) 0,var(--green) 18px, var(--gold) 18px, var(--gold) 24px);
+}
+header {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--gold-dim);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.h-cn {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--gold-l); letter-spacing: 0.1em;
+}
+.h-de { font-size: 13px; color: var(--muted); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+#count-badge {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 500;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+#count-badge[data-active="1"] {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+/* Umsatz-Banner */
+.umsatz-banner {
+  margin: 20px 24px 4px;
+  background: var(--surface);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.umsatz-label {
+  font-size: 14px; color: var(--muted);
+}
+.umsatz-label span {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px; color: var(--gold);
+  display: block; margin-top: 2px;
+}
+#gesamt-umsatz {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 28px; font-weight: 600;
+  color: var(--gold-l);
+}
+
+#empty-state {
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 55vh; gap: 16px; text-align: center;
+}
+.empty-char {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 72px; color: var(--gold);
+  opacity: 0.15; line-height: 1;
+}
+.empty-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px; color: var(--muted); font-weight: 500;
+}
+.empty-sub { font-size: 14px; color: var(--muted); opacity: 0.6; }
+
+#orders-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px; padding: 16px 24px;
+}
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.tisch-nr {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 32px; font-weight: 600;
+  color: var(--gold-l); line-height: 1;
+}
+.tisch-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.bezahlt-badge {
+  font-size: 11px; font-weight: 500;
+  background: var(--green); color: white;
+  padding: 3px 9px; border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.order-time { font-size: 13px; color: var(--muted); }
+.items-list { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+.item-row { display: flex; align-items: baseline; gap: 10px; }
+.item-qty {
+  font-size: 14px; font-weight: 500; color: var(--gold);
+  min-width: 28px; flex-shrink: 0;
+}
+.item-name { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.4; }
+.item-price { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.card-foot {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
+}
+.total {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; color: var(--gold); font-weight: 500;
+}
+</style>
+</head>
+<body>
+<div class="top-strip"></div>
+<header>
+  <div class="header-left">
+    <span style="font-size:26px">📋</span>
+    <div>
+      <div class="h-cn">历史记录</div>
+      <div class="h-de">Bestellverlauf (letzte 24 Std.)</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="count-badge" data-active="0">0</div>
+  </div>
+</header>
+
+<div class="umsatz-banner">
+  <div class="umsatz-label">
+    Gesamtumsatz
+    <span>最近24小时营业额</span>
+  </div>
+  <div id="gesamt-umsatz">0,00 €</div>
+</div>
+
+<div id="empty-state">
+  <div class="empty-char">空</div>
+  <div class="empty-text">Keine bezahlten Bestellungen</div>
+  <div class="empty-sub">in den letzten 24 Stunden</div>
+</div>
+
+<div id="orders-container"></div>
+</body>
+</html>
