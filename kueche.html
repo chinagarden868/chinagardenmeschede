@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 
-
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -26,13 +25,32 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  // Buffet - Nachfüllen
+  // Ton für Bestellungen
+  function playSound() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.15, 0.3].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = i === 0 ? 880 : i === 1 ? 1100 : 1320;
+      gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.3);
+    });
+  }
+
+  // Buffet- Nachfüllen
+  let prevBuffetCount = null;
   onValue(ref(db, "buffet"), snapshot => {
     const data = snapshot.val() || {};
     const requests = Object.entries(data)
       .map(([key, val]) => ({ key, ...val }))
       .filter(r => r.status === "neu")
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    if (prevBuffetCount !== null && requests.length > prevBuffetCount) playSound();
+    prevBuffetCount = requests.length;
     renderBuffet(requests);
   });
 
@@ -67,13 +85,16 @@
     document.getElementById("buffet-frittiert").innerHTML = makeCards(frittiert);
   }
 
-  // Kunden
+  // Bestellungen
+  let prevOrderCount = null;
   onValue(ref(db, "bestellungen"), snapshot => {
     const data = snapshot.val() || {};
     const orders = Object.entries(data)
       .map(([key, val]) => ({ key, ...val }))
       .filter(o => o.status !== "fertig" && o.status !== "bezahlt")
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    if (prevOrderCount !== null && orders.length > prevOrderCount) playSound();
+    prevOrderCount = orders.length;
     renderOrders(orders);
   });
 
@@ -261,7 +282,7 @@ header {
   align-items: center; justify-content: center;
 }
 .buffet-done:active { opacity: 0.7; }
-/* ── Ende Buffet ── */
+/* Ende Buffet */
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
   min-height: 65vh; gap: 16px; text-align: center;
@@ -375,27 +396,27 @@ header {
 
 <div id="buffet-section">
   <div class="buffet-header">
-    🍽 自助餐
+    🍽 自助餐 - Buffet
     <span id="buffet-badge"></span>
   </div>
   <div class="buffet-cols">
     <div class="buffet-col">
-      <div class="buffet-col-title"> 炒菜</div>
+      <div class="buffet-col-title">🥢 炒菜 · Gebratenes</div>
       <div id="buffet-gebraten" class="buffet-list"></div>
     </div>
     <div class="buffet-col">
-      <div class="buffet-col-title"> 炸菜 </div>
+      <div class="buffet-col-title">🍤 炸菜 · Frittiertes</div>
       <div id="buffet-frittiert" class="buffet-list"></div>
     </div>
   </div>
 </div>
-
+  
 <div id="empty-state">
   <div class="empty-char"> 无 - 可以休息一会 :D </div>
-  <div class="empty-text">Gerade keine offenen Bestellungen - Etwas ausruhen :D </div>
-  <div class="empty-sub">Neue Bestellungen erscheinen hier :) </div>
+  <div class="empty-text"> Gerade keine offenen Bestellungen - Etwas ausruhen :D </div>
+  <div class="empty-sub"> Neue Bestellungen erscheinen hier :) </div>
 </div>
-
+  
 <div id="orders-grid"></div>
 </body>
 </html>
