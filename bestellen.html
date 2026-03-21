@@ -280,7 +280,7 @@ header h1 {
 </div>
 
 <div id="success-screen">
-  <div class="success-char">谢谢！</div>
+  <div class="success-char">  谢谢！</div>
   <h2>Bestellung aufgegeben!</h2>
   <p>Die Küche hat deine Bestellung<br>erhalten und bereitet sie vor.</p>
 </div>
@@ -422,13 +422,26 @@ const MENU = [
   { id:"D7", cat:"Desserts", name:"D7. 3 Kugeln Eis (unterschiedliche Sorten)",   cn:"三球冰淇淋", desc:"",                          price:3.50 },
 ];
 
-// Menü aufbauen 
+
 (function buildMenu() {
-  const cats = [...new Set(MENU.map(i => i.cat))];
+  // Prüfe ob Mittagsmenü verfügbar ist (Mo-So 11:30–15:00)
+  const now = new Date();
+  const day = now.getDay(); 
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  const timeInMinutes = hour * 60 + minute;
+  const mittagStart = 11 * 60 + 30;
+  const mittagEnd = 15 * 60;      
+  const isMittagszeit = day >= 0 && day <= 6 && timeInMinutes >= mittagStart && timeInMinutes < mittagEnd;
+
+  
+  const MENU_FILTERED = isMittagszeit ? MENU : MENU.filter(i => i.cat !== "Mittagsmenü");
+
+  const cats = [...new Set(MENU_FILTERED.map(i => i.cat))];
   const container = document.getElementById("menu-container");
   const nav = document.getElementById("cat-nav");
 
-  // Tabs
+  //
   cats.forEach((cat, idx) => {
     const btn = document.createElement("button");
     btn.className = "cat-tab" + (idx === 0 ? " active" : "");
@@ -441,14 +454,14 @@ const MENU = [
     nav.appendChild(btn);
   });
 
-  // Sections
+  //
   cats.forEach((cat, idx) => {
     const wrap = document.createElement("div");
     wrap.className = "section-wrap";
     wrap.id = "sec-" + idx;
     wrap.innerHTML = `<div class="section-title"><span>${cat}</span></div>`;
 
-    MENU.filter(i => i.cat === cat).forEach(item => {
+    MENU_FILTERED.filter(i => i.cat === cat).forEach(item => {
       const card = document.createElement("div");
       card.className = "item-card";
       card.innerHTML = `
