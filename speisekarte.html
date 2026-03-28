@@ -13,7 +13,7 @@
   .stripe{height:6px;background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px)}
   nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 4rem;background:rgba(30,10,13,.97);backdrop-filter:blur(20px);border-bottom:2px solid var(--red);box-shadow:0 2px 30px rgba(139,26,42,.3);transition:padding .3s}
   .nav-logo-wrap{display:flex;align-items:center;gap:1rem;text-decoration:none}
-  .nav-logo-img { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; flex-shrink: 0; }
+  .nav-logo-img { width: 52px; height: 52px; object-fit: contain; flex-shrink: 0; }
   .nav-logo-text{display:flex;flex-direction:column}
   .nav-logo-text span:first-child{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);letter-spacing:.05em;line-height:1.1}
   .nav-logo-text span:last-child{font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:.25em;text-transform:uppercase}
@@ -112,7 +112,7 @@
 <body>
 
 <nav id="mainNav">
-  <a class="nav-logo-wrap" href="chinagarden_homepage.html">
+  <a class="nav-logo-wrap" href="homepage.html">
     <img class="nav-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
     <div class="nav-logo-text">
       <span>China Garden</span>
@@ -120,10 +120,10 @@
     </div>
   </a>
   <ul class="nav-links">
-    <li><a href="chinagarden_homepage.html">Startseite</a></li>
+    <li><a href="homepage.html">Startseite</a></li>
     <li><a href="buffet_seite.html">Buffet</a></li>
     <li><a href="party-service.html">Party-Service</a></li>
-    <li><a href="chinagarden_homepage.html#hours">Öffnungszeiten</a></li>
+    <li><a href="homepage.html#hours">Öffnungszeiten</a></li>
     <li><a href="kontakt.html" class="nav-cta">Reservieren</a></li>
   </ul>
 </nav>
