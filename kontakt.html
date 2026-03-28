@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt & Reservierung – China Garden Meschede</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #8B1A2A; --red-mid: #A82035;
+    --cream: #F9F3E8; --parchment: #F4EAD5;
+    --ink: #1E0A0D; --gold: #C49A2A; --gold-light: #DFB84A; --gold-pale: #F5E5B0;
+    --mid: #7A6060; --border-red: rgba(139,26,42,0.2);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+  .stripe { height: 6px; background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+
+  /* NAV */
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0.9rem 4rem; background:rgba(30,10,13,0.97); backdrop-filter:blur(20px); border-bottom:2px solid var(--red); box-shadow:0 2px 30px rgba(139,26,42,0.3); transition:padding 0.3s; }
+  .nav-logo { display:flex; align-items:center; gap:1rem; text-decoration:none; }
+  .nav-logo-img { width:52px; height:52px; border-radius:50%; border:2px solid var(--gold); object-fit:cover; flex-shrink:0; }
+  .nav-logo span:first-child { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold); letter-spacing:0.05em; line-height:1.1; display:block; }
+  .nav-logo span:last-child { font-size:0.6rem; color:rgba(255,255,255,0.4); letter-spacing:0.25em; text-transform:uppercase; display:block; }
+  .nav-links { display:flex; gap:2rem; list-style:none; }
+  .nav-links a { text-decoration:none; color:rgba(255,255,255,0.55); font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--gold); }
+  .nav-links a.active { color:var(--gold); }
+  .nav-cta { background:var(--red) !important; color:#fff !important; padding:0.5rem 1.3rem; border:1px solid var(--red-mid) !important; border-radius:2px; }
+
+  /* HERO */
+  .page-hero { background:var(--ink); padding:6rem 7rem 5rem; position:relative; overflow:hidden; }
+  .hero-lattice { position:absolute; inset:0; pointer-events:none; opacity:0.04; background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px); }
+  .hero-lanterns { position:absolute; top:0; right:4rem; z-index:5; display:flex; gap:3.5rem; }
+  .lantern { display:flex; flex-direction:column; align-items:center; animation:sway 6s ease-in-out infinite; }
+  .lantern:nth-child(2){animation-delay:-2s;animation-duration:7s;margin-top:50px;}
+  .lantern:nth-child(3){animation-delay:-4s;animation-duration:8s;margin-top:25px;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .lantern-cord { width:1px; height:55px; background:rgba(196,154,42,0.4); }
+  .lantern-body { width:22px; height:34px; background:radial-gradient(ellipse,#CC2A2A 0%,#8B1A2A 60%,#5C0E1A 100%); border-radius:50%/30%; border:1px solid rgba(196,154,42,0.5); box-shadow:0 0 10px rgba(200,40,40,0.6),0 0 20px rgba(200,40,40,0.3); }
+  .hero-inner { position:relative; z-index:2; }
+  .hero-eyebrow { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; }
+  .chin-char { font-family:'Noto Serif SC',serif; font-size:1.4rem; color:var(--gold); text-shadow:0 0 20px rgba(196,154,42,0.4); }
+  .sep { width:1px; height:26px; background:rgba(196,154,42,0.4); }
+  .hero-eyebrow span:last-child { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+  .page-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.2rem); color:#fff; font-weight:400; line-height:1.1; margin-bottom:0.8rem; }
+  .page-hero h1 em { font-style:italic; color:var(--gold); }
+  .page-hero-sub { color:rgba(255,255,255,0.35); font-size:0.9rem; font-weight:300; }
+
+  /* MAIN GRID */
+  .contact-body { display:grid; grid-template-columns:1fr 1.1fr; gap:0; min-height:70vh; }
+
+  /* LEFT – info panel */
+  .info-panel { background:var(--ink); padding:4rem 5rem 5rem 7rem; border-right:1px solid rgba(139,26,42,0.25); position:relative; }
+  .info-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+
+  .section-label { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; }
+  .section-label .chin { font-family:'Noto Serif SC',serif; font-size:1.1rem; color:rgba(196,154,42,0.7); }
+  .section-label::after { content:''; flex:0 0 32px; height:1px; background:rgba(255,255,255,0.15); }
+  .section-label span:not(.chin) { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+
+  .contact-items { display:flex; flex-direction:column; gap:0; margin-bottom:2.5rem; }
+  .contact-item { display:flex; gap:1.2rem; align-items:flex-start; padding:1.4rem 0; border-bottom:1px solid rgba(139,26,42,0.2); }
+  .contact-item:last-child { border-bottom:none; }
+  .ci-icon { width:42px; height:42px; background:var(--red); border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; margin-top:0.1rem; }
+  .ci-text strong { display:block; font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.25); margin-bottom:0.3rem; font-weight:400; }
+  .ci-text a, .ci-text span { color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.95rem; line-height:1.6; display:block; transition:color 0.2s; }
+  .ci-text a:hover { color:var(--gold-light); }
+
+  /* Hours mini-table */
+  .hours-mini { width:100%; border-collapse:collapse; margin-top:0.5rem; }
+  .hours-mini tr { border-bottom:1px solid rgba(139,26,42,0.15); }
+  .hours-mini tr:last-child { border-bottom:none; }
+  .hours-mini td { padding:0.6rem 0; font-size:0.82rem; }
+  .hours-mini td:first-child { color:rgba(255,255,255,0.35); font-weight:300; }
+  .hours-mini td:last-child { color:rgba(255,255,255,0.65); text-align:right; font-family:'Playfair Display',serif; font-size:0.88rem; }
+  .closed-tag { font-size:0.65rem; background:rgba(139,26,42,0.25); color:#E07080; padding:0.15rem 0.5rem; border-radius:2px; letter-spacing:0.08em; font-family:'DM Sans',sans-serif; }
+
+  /* Map placeholder */
+  .map-box { margin-top:2rem; background:rgba(255,255,255,0.03); border:1px solid rgba(139,26,42,0.2); border-radius:4px; overflow:hidden; }
+  .map-placeholder { height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5rem; }
+  .map-placeholder .map-icon { font-size:2rem; }
+  .map-placeholder p { font-size:0.78rem; color:rgba(255,255,255,0.25); }
+  .map-placeholder a { font-size:0.75rem; color:var(--red); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; }
+  .map-placeholder a:hover { color:var(--gold); }
+
+  /* RIGHT – form panel */
+  .form-panel { background:var(--cream); padding:4rem 7rem 5rem 5rem; position:relative; }
+  .form-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+
+  .form-title { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--ink); font-weight:400; margin-bottom:0.4rem; }
+  .form-title em { font-style:italic; color:var(--red); }
+  .form-sub { font-size:0.85rem; color:var(--mid); margin-bottom:2rem; font-weight:300; }
+
+  .form-box { background:var(--ink); border-radius:6px; padding:2.5rem; border:1px solid rgba(139,26,42,0.25); position:relative; box-shadow:0 8px 40px rgba(30,10,13,0.12); }
+  .form-box::before { content:''; position:absolute; inset:8px; border:1px solid rgba(139,26,42,0.12); border-radius:4px; pointer-events:none; }
+
+  .form-group { margin-bottom:1.1rem; position:relative; z-index:1; }
+  .form-group label { display:block; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.4rem; }
+  .form-group input, .form-group textarea, .form-group select {
+    width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(139,26,42,0.3);
+    border-radius:2px; padding:0.75rem 1rem; color:#fff;
+    font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:300;
+    outline:none; transition:border-color 0.2s; -webkit-appearance:none;
+  }
+  .form-group select option { background:#1E0A0D; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--red); }
+  .form-group textarea { height:95px; resize:none; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+  .submit-btn { width:100%; background:var(--red); color:#fff; border:none; padding:1rem; font-size:0.8rem; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; border-radius:2px; margin-top:0.8rem; transition:all 0.2s; font-family:'DM Sans',sans-serif; position:relative; z-index:1; border:1px solid var(--red-mid); }
+  .submit-btn:hover { background:var(--red-mid); }
+
+  .form-note { font-size:0.75rem; color:rgba(255,255,255,0.2); text-align:center; margin-top:1rem; position:relative; z-index:1; font-weight:300; }
+
+  /* Divider */
+  .chin-divider { display:flex; align-items:center; gap:1.5rem; margin:2rem 0; }
+  .chin-divider::before,.chin-divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,rgba(139,26,42,0.2),transparent); }
+  .chin-divider span { font-family:'Noto Serif SC',serif; font-size:0.9rem; color:var(--red); opacity:0.5; }
+
+  /* FOOTER */
+  .footer-bottom { background:#0D0508; padding:2rem 7rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(139,26,42,0.2); }
+  .footer-bottom p { font-size:0.75rem; color:rgba(255,255,255,0.15); }
+  .footer-bottom a { color:var(--red); text-decoration:none; font-size:0.78rem; transition:color 0.2s; }
+  .footer-bottom a:hover { color:var(--gold); }
+
+  .back-top { position:fixed; bottom:2rem; right:2rem; z-index:200; width:44px; height:44px; background:var(--red); border:none; border-radius:2px; color:#fff; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(10px); transition:all 0.3s; box-shadow:0 4px 20px rgba(139,26,42,0.5); }
+  .back-top.visible { opacity:1; transform:translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width:960px) {
+    nav { padding:0.8rem 1.5rem; }
+    .nav-links { display:none; }
+    .page-hero { padding:5.5rem 2rem 3rem; }
+    .hero-lanterns { display:none; }
+    .contact-body { grid-template-columns:1fr; }
+    .info-panel { padding:3rem 2rem; }
+    .form-panel { padding:3rem 2rem; }
+    .form-row { grid-template-columns:1fr; }
+    .footer-bottom { padding:1.5rem; flex-direction:column; gap:0.5rem; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="chinagarden_homepage.html">
+    <img class="nav-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+    <div>
+      <span>China Garden</span>
+      <span>Meschede</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="chinagarden_homepage.html">Startseite</a></li>
+    <li><a href="speisekarte.html">Speisekarte</a></li>
+    <li><a href="buffet_seite.html">Buffet</a></li>
+    <li><a href="party-service.html">Party-Service</a></li>
+    <li><a href="chinagarden_homepage.html#hours">Öffnungszeiten</a></li>
+    <li><a href="#" class="nav-cta active">Reservieren</a></li>
+  </ul>
+</nav>
+
+<div class="stripe"></div>
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="hero-lattice"></div>
+  <div class="hero-lanterns">
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="chin-char"></span>
+      <div class="sep"></div>
+      <span>Kontakt & Reservierung</span>
+    </div>
+    <h1>Reservierungen &amp;<br><em>Anfragen</em></h1>
+    <p class="page-hero-sub">Wir freuen uns auf Ihre Nachricht – telefonisch, per WhatsApp oder über unser Formular.</p>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="contact-body">
+
+  <!-- LEFT: INFO -->
+  <div class="info-panel">
+    <div class="section-label"><span class="chin"></span><span>Unsere Angaben</span></div>
+
+    <div class="contact-items">
+      <div class="contact-item">
+        <div class="ci-icon">📍</div>
+        <div class="ci-text">
+          <strong>Adresse</strong>
+          <span>China Garden</span>
+          <span>Kolpingstr. 2</span>
+          <span>59872 Meschede, NRW</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">📞</div>
+        <div class="ci-text">
+          <strong>Telefon</strong>
+          <a href="tel:02919086372">0291 9086372</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">💬</div>
+        <div class="ci-text">
+          <strong>WhatsApp</strong>
+          <a href="https://wa.me/4915172841990">0151 7284199</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">🌐</div>
+        <div class="ci-text">
+          <strong>Website</strong>
+          <a href="http://www.chinagardenmeschede.de">www.chinagardenmeschede.de</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">🕐</div>
+        <div class="ci-text">
+          <strong>Öffnungszeiten</strong>
+          <table class="hours-mini">
+            <tr><td>Mittwoch</td><td><span class="closed-tag">Ruhetag</span></td></tr>
+            <tr><td>Mo – Di & Do</td><td>11:30 – 15:00 & 17:00 – 22:00</td></tr>
+            <tr><td>Fr – So & Feiertage</td><td>11:30 – 15:00 & 17:00 – 23:00</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-box">
+      <div class="map-placeholder">
+        <div class="map-icon">🗺️</div>
+        <p>Kolpingstr. 2 · 59872 Meschede</p>
+        <a href="https://maps.google.com/?q=Kolpingstr.+2,+59872+Meschede" target="_blank">In Google Maps öffnen →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: FORM -->
+  <div class="form-panel">
+    <div class="form-title">Ihre <em>Reservierungsanfrage</em></div>
+    <p class="form-sub">Füllen Sie das Formular aus – wir melden uns schnellstmöglich bei Ihnen.</p>
+
+    <form class="form-box" id="reservierungForm" onsubmit="sendReservierung(event)">
+      <div class="form-row">
+        <div class="form-group"><label>Vorname</label><input type="text" name="vorname" required></div>
+        <div class="form-group"><label>Nachname</label><input type="text" name="nachname" required></div>
+      </div>
+      <div class="form-group"><label>Telefon</label><input type="tel" name="kontakt" required></div>
+      <div class="form-group"><label>E-Mail</label><input type="email" name="email"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Datum</label><input type="date" name="datum" required></div>
+        <div class="form-group"><label>Uhrzeit</label><input type="time" name="uhrzeit" value="18:00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Anzahl Personen</label>
+          <select name="personen">
+            <option>1 Person</option>
+            <option selected>2 Personen</option>
+            <option>3 – 4 Personen</option>
+            <option>5 – 6 Personen</option>
+            <option>7 – 10 Personen</option>
+            <option>10+ Personen</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Anlass</label>
+          <select name="anlass">
+            <option>Kein besonderer Anlass</option>
+            <option>Geburtstag</option>
+            <option>Familienfeier</option>
+            <option>Betriebsfeier</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Nachricht (optional)</label><textarea name="nachricht" placeholder="Besondere Wünsche, Allergien, Fragen …"></textarea></div>
+      <button type="submit" class="submit-btn" id="reservierungBtn">Reservierung anfragen</button>
+      <div id="reservierungMsg" style="display:none; margin-top:1rem; padding:1rem; background:rgba(196,154,42,0.1); border:1px solid var(--gold); border-radius:4px; color:var(--gold-light); font-size:0.85rem; text-align:center;">
+        ✓ Ihre Anfrage wurde gesendet! Wir melden uns schnellstmöglich bei Ihnen.
+      </div>
+      <p class="form-note">Ihre Anfrage wird telefonisch oder per E-Mail bestätigt. Für kurzfristige Reservierungen rufen Sie uns bitte direkt an.</p>
+    </form>
+
+    <div class="chin-divider"><span>✦</span></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <a href="tel:02919086372" style="display:flex;align-items:center;gap:0.8rem;background:var(--ink);border:1px solid rgba(139,26,42,0.3);border-radius:4px;padding:1.2rem 1.5rem;text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(139,26,42,0.6)'" onmouseout="this.style.borderColor='rgba(139,26,42,0.3)'">
+        <div style="width:36px;height:36px;background:var(--red);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">📞</div>
+        <div>
+          <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:0.2rem;">Direkt anrufen</div>
+          <div style="font-family:'Playfair Display',serif;font-size:0.9rem;color:#fff;">0291 9086372</div>
+        </div>
+      </a>
+      <a href="https://wa.me/4915172841990" target="_blank" style="display:flex;align-items:center;gap:0.8rem;background:var(--ink);border:1px solid rgba(139,26,42,0.3);border-radius:4px;padding:1.2rem 1.5rem;text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(139,26,42,0.6)'" onmouseout="this.style.borderColor='rgba(139,26,42,0.3)'">
+        <div style="width:36px;height:36px;background:var(--red);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">💬</div>
+        <div>
+          <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:0.2rem;">WhatsApp</div>
+          <div style="font-family:'Playfair Display',serif;font-size:0.9rem;color:#fff;">0151 7284199</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="stripe"></div>
+
+<div class="footer-bottom">
+  <p>© 2026 China Garden Meschede · <span style="font-family:'Noto Serif SC',serif;color:rgba(196,154,42,0.4);">中 華 園</span></p>
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+    <a href="chinagarden_homepage.html">← Startseite</a>
+    <a href="speisekarte.html">Speisekarte</a>
+    <a href="buffet_seite.html">Buffet</a>
+    <a href="impressum.html">Impressum</a>
+  </div>
+</div>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  window.addEventListener('scroll', () => {
+    document.getElementById('backTop').classList.toggle('visible', window.scrollY > 300);
+    const nav = document.getElementById('mainNav');
+    nav.style.padding = window.scrollY > 60 ? '0.6rem 4rem' : '0.9rem 4rem';
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init("btQTTbCa4mU688SVs");
+
+  function sendReservierung(e) {
+    e.preventDefault();
+    const btn = document.getElementById('reservierungBtn');
+    btn.textContent = 'Wird gesendet...';
+    btn.disabled = true;
+
+    emailjs.sendForm('service_68uz05r', 'template_b51l8ra', '#reservierungForm')
+      .then(() => {
+        document.getElementById('reservierungMsg').style.display = 'block';
+        btn.textContent = 'Gesendet ✓';
+      })
+      .catch(() => {
+        btn.textContent = 'Fehler – bitte erneut versuchen';
+        btn.disabled = false;
+      });
+  }
+</script>
+</body>
+</html>

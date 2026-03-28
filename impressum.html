@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impressum – China Garden Meschede</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #8B1A2A; --red-mid: #A82035;
+    --cream: #F9F3E8; --parchment: #F4EAD5;
+    --ink: #1E0A0D; --gold: #C49A2A; --gold-light: #DFB84A; --gold-pale: #F5E5B0;
+    --mid: #7A6060; --border-red: rgba(139,26,42,0.2);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+  .stripe { height: 6px; background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 4rem; background: rgba(30,10,13,0.97); backdrop-filter: blur(20px); border-bottom: 2px solid var(--red); box-shadow: 0 2px 30px rgba(139,26,42,0.3); transition: padding 0.3s; }
+  .nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+  .nav-logo span:first-child { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1.1; display: block; }
+  .nav-logo span:last-child { font-size: 0.6rem; color: rgba(255,255,255,0.4); letter-spacing: 0.25em; text-transform: uppercase; display: block; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: rgba(255,255,255,0.55); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
+
+  /* PAGE HERO */
+  .page-hero {
+    background: var(--ink); padding: 6rem 7rem 4rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-lattice { position: absolute; inset: 0; pointer-events: none; opacity: 0.04; background-image: repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px); }
+  .hero-inner { position: relative; z-index: 2; }
+  .hero-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .chin-char { font-family: 'Noto Serif SC', serif; font-size: 1.4rem; color: var(--gold); text-shadow: 0 0 20px rgba(196,154,42,0.4); }
+  .sep { width: 1px; height: 26px; background: rgba(196,154,42,0.4); }
+  .hero-eyebrow span:last-child { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem,4vw,3.8rem); color: #fff; font-weight: 400; line-height: 1.1; margin-bottom: 0.8rem; }
+  .page-hero h1 em { font-style: italic; color: var(--gold); }
+  .page-hero-note { color: rgba(255,255,255,0.35); font-size: 0.85rem; font-weight: 300; }
+
+  /* MAIN CONTENT */
+  .impressum-body { padding: 4rem 7rem 6rem; background: var(--cream); }
+
+  /* CONTACT CARD – big prominent one */
+  .contact-card {
+    background: var(--ink); border-radius: 6px;
+    border: 1px solid rgba(196,154,42,0.15);
+    overflow: hidden; margin-bottom: 3rem;
+    box-shadow: 0 8px 40px rgba(30,10,13,0.15);
+  }
+  .contact-card-header {
+    background: var(--red); padding: 2rem 3rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .contact-card-header::after { content:''; font-family:'Noto Serif SC',serif; position:absolute; right:-5px; top:50%; transform:translateY(-50%); font-size:7rem; color:rgba(255,255,255,0.06); line-height:1; }
+  .contact-card-header-text {}
+  .contact-card-header-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.3rem; }
+  .contact-card-header-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold-pale); font-weight: 400; }
+  .contact-card-header-sub { font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-top: 0.2rem; }
+
+  .contact-card-body { padding: 2.5rem 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+  .contact-group {}
+  .contact-group-label { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+  .contact-group-label::before { content:''; display:inline-block; width:16px; height:1px; background:var(--red); opacity:0.6; }
+  .contact-group-value { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: rgba(255,255,255,0.75); font-weight: 400; line-height: 1.5; }
+  .contact-group-value a { color: var(--gold-light); text-decoration: none; transition: color 0.2s; }
+  .contact-group-value a:hover { color: var(--gold); }
+  .contact-group-value.small { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.5); }
+
+  /* HOURS TABLE inside card */
+  .hours-table { width: 100%; border-collapse: collapse; }
+  .hours-table tr { border-bottom: 1px solid rgba(196,154,42,0.08); }
+  .hours-table tr:last-child { border-bottom: none; }
+  .hours-table td { padding: 0.7rem 0; font-size: 0.85rem; vertical-align: top; }
+  .hours-table td:first-child { color: rgba(255,255,255,0.4); font-weight: 300; padding-right: 1.5rem; white-space: nowrap; }
+  .hours-table td:last-child { color: rgba(255,255,255,0.7); font-family: 'Playfair Display', serif; font-size: 0.9rem; text-align: right; }
+  .closed-tag { background: rgba(139,26,42,0.25); color: #E07080; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 2px; letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif; }
+
+  /* LEGAL SECTIONS */
+  .legal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+  .legal-block {
+    background: var(--parchment); border: 1px solid var(--border-red); border-radius: 4px;
+    padding: 2rem 2.5rem; position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .legal-block:hover { border-color: rgba(139,26,42,0.4); }
+  .legal-block-full {
+    background: var(--parchment); border: 1px solid var(--border-red); border-radius: 4px;
+    padding: 2rem 2.5rem; margin-bottom: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .legal-block-deco { position: absolute; top: -10px; right: 10px; font-family: 'Noto Serif SC', serif; font-size: 4rem; color: rgba(139,26,42,0.05); line-height: 1; pointer-events: none; }
+  .legal-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--red); font-weight: 500; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.6rem; }
+  .legal-title::before { content:''; width:3px; height:16px; background:var(--red); border-radius:2px; flex-shrink:0; }
+  .legal-text { font-size: 0.85rem; color: var(--mid); line-height: 1.85; font-weight: 300; }
+  .legal-text a { color: var(--red); text-decoration: none; }
+  .legal-text a:hover { text-decoration: underline; }
+  .legal-text strong { color: var(--ink); font-weight: 500; }
+  .legal-text p + p { margin-top: 0.7rem; }
+
+  /* DIVIDER */
+  .chin-divider { display: flex; align-items: center; gap: 1.5rem; margin: 2.5rem 0; }
+  .chin-divider::before,.chin-divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--border-red),transparent); }
+  .chin-divider span { font-family: 'Noto Serif SC', serif; font-size: 1rem; color: var(--red); opacity: 0.45; }
+
+  /* FOOTER */
+  .footer-bottom { background: #0D0508; padding: 2rem 7rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(139,26,42,0.2); }
+  .footer-bottom p { font-size: 0.75rem; color: rgba(255,255,255,0.15); }
+  .footer-bottom a { color: var(--red); text-decoration: none; font-size: 0.78rem; transition: color 0.2s; }
+  .footer-bottom a:hover { color: var(--gold); }
+
+  @media (max-width: 960px) {
+    nav { padding: 0.8rem 1.5rem; }
+    .nav-links { display: none; }
+    .page-hero { padding: 5.5rem 2rem 3rem; }
+    .impressum-body { padding: 2.5rem 1.5rem 4rem; }
+    .contact-card-body { grid-template-columns: 1fr; gap: 1.5rem; }
+    .contact-card-header { padding: 1.5rem 2rem; }
+    .legal-grid { grid-template-columns: 1fr; }
+    .footer-bottom { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">
+    <span>China Garden</span>
+    <span>Meschede</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Startseite</a></li>
+    <li><a href="speisekarte.html">Speisekarte</a></li>
+    <li><a href="Buffet_angebot.html">Buffet</a></li>
+    <li><a href="party-service.html">Party-Service</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Reservieren</a></li>
+  </ul>
+</nav>
+
+<div class="stripe"></div>
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="hero-lattice"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span>Rechtliche Angaben</span>
+    </div>
+    <h1>Impressum</h1>
+    <p class="page-hero-note">Alle Angaben gemäß § 5 TMG</p>
+  </div>
+</section>
+
+<!-- BODY -->
+<div class="impressum-body">
+
+  <!-- BIG CONTACT CARD -->
+  <div class="contact-card">
+    <div class="contact-card-header">
+      <div class="contact-card-header-text">
+        <div class="contact-card-header-label">Verantwortlich für diese Website</div>
+        <div class="contact-card-header-title">China Garden Meschede</div>
+        <div class="contact-card-header-sub">China Restaurant</div>
+      </div>
+    </div>
+    <div class="contact-card-body">
+      <div>
+        <div class="contact-group" style="margin-bottom:1.8rem;">
+          <div class="contact-group-label">Inhaber</div>
+          <div class="contact-group-value">Konglin Chen</div>
+        </div>
+        <div class="contact-group" style="margin-bottom:1.8rem;">
+          <div class="contact-group-label">Anschrift</div>
+          <div class="contact-group-value">
+            China Garden<br>
+            Kolpingstr. 2<br>
+            59872 Meschede<br>
+            Nordrhein-Westfalen
+          </div>
+        </div>
+        <div class="contact-group" style="margin-bottom:1.8rem;">
+          <div class="contact-group-label">Telefon</div>
+          <div class="contact-group-value"><a href="tel:029190863720291-90 86 372">0291-90 86 372</a></div>
+        </div>
+        <div class="contact-group" style="margin-bottom:1.8rem;">
+          <div class="contact-group-label">WhatsApp</div>
+          <div class="contact-group-value"><a href="https://wa.me/4915172841990">0151 7284199</a></div>
+        </div>
+        <div class="contact-group">
+          <div class="contact-group-label">Website</div>
+          <div class="contact-group-value"><a href="http://www.chinagardenmeschede.de">www.chinagardenmeschede.de</a></div>
+        </div>
+      </div>
+      <div>
+        <div class="contact-group-label" style="color:rgba(255,255,255,0.25);font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;">
+          <span style="display:inline-block;width:16px;height:1px;background:#8B1A2A;opacity:0.6;"></span>Öffnungszeiten
+        </div>
+        <table class="hours-table">
+          <tr><td>Montag – Donnerstag</td><td>11:30 – 15:00 &amp; 17:30 – 22:00</td></tr>
+          <tr><td>Mittwoch</td><td><span class="closed-tag">Ruhetag</span></td></tr>
+          <tr><td>Freitag – Sonntag & Feiertage</td><td>11:30 – 15:00 &amp; 17:30 – 23:00</td></tr>
+        </table>
+        <div style="margin-top:1.2rem;padding:0.8rem 1rem;background:rgba(196,154,42,0.06);border:1px solid rgba(196,154,42,0.12);border-radius:3px;">
+          <p style="font-size:0.78rem;color:rgba(255,255,255,0.3);font-weight:300;line-height:1.6;">Mittwoch ist unser Ruhetag – außer an Feiertagen, dann sind wir für Sie geöffnet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chin-divider"><span>✦</span></div>
+
+  <!-- LEGAL BLOCKS -->
+  <div class="legal-grid">
+    <div class="legal-block">
+      <div class="legal-block-deco">法</div>
+      <div class="legal-title">Angaben gemäß § 5 TMG</div>
+      <div class="legal-text">
+        <p><strong>China Garden</strong><br>
+        Inhaber: Konglin Chen<br>
+        Kolpingstr. 2<br>
+        59872 Meschede</p>
+        <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: auf Anfrage</p>
+      </div>
+    </div>
+    <div class="legal-block">
+      <div class="legal-block-deco">责</div>
+      <div class="legal-title">Verantwortlich für den Inhalt</div>
+      <div class="legal-text">
+        <p>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
+        <p><strong>Konglin Chen</strong><br>
+        Kolpingstr. 2<br>
+        59872 Meschede</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-block-full">
+    <div class="legal-block-deco">声</div>
+    <div class="legal-title">Haftungsausschluss</div>
+    <div class="legal-text">
+      <p><strong>Haftung für Inhalte:</strong> Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.</p>
+      <p><strong>Haftung für Links:</strong> Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.</p>
+    </div>
+  </div>
+
+  <div class="legal-grid">
+    <div class="legal-block">
+      <div class="legal-block-deco">版</div>
+      <div class="legal-title">Urheberrecht</div>
+      <div class="legal-text">
+        <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
+      </div>
+    </div>
+    <div class="legal-block">
+      <div class="legal-block-deco">私</div>
+      <div class="legal-title">Datenschutz</div>
+      <div class="legal-text">
+        <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies stets auf freiwilliger Basis.</p>
+        <p>Wir weisen darauf hin, dass die Datenübertragung im Internet Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-block-full">
+    <div class="legal-block-deco">争</div>
+    <div class="legal-title">Streitschlichtung</div>
+    <div class="legal-text">
+      <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a>.</p>
+      <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="stripe"></div>
+
+<div class="footer-bottom">
+  <p>© 2026 China Garden Meschede · <span style="font-family:'Noto Serif SC',serif;color:rgba(196,154,42,0.4);"></span></p>
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+    <a href="index.html">← Startseite</a>
+    <a href="speisekarte.html">Speisekarte</a>
+    <a href="Buffet_angebot.html">Buffet</a>
+    <a href="party-service.html">Party-Service</a>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('mainNav');
+    nav.style.padding = window.scrollY > 60 ? '0.6rem 4rem' : '0.9rem 4rem';
+  });
+</script>
+</body>
+</html>

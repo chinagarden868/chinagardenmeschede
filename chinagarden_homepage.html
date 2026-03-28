@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>China Garden Meschede</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #8B1A2A; --red-dark: #5C0E1A; --red-mid: #A82035;
+    --cream: #F9F3E8; --parchment: #F4EAD5;
+    --ink: #1E0A0D; --gold: #C49A2A; --gold-light: #DFB84A; --gold-pale: #F5E5B0;
+    --mid: #7A6060; --border-red: rgba(139,26,42,0.2); --border-gold: rgba(196,154,42,0.3);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem 4rem;
+    background: rgba(30,10,13,0.96); backdrop-filter: blur(20px);
+    border-bottom: 2px solid var(--red); box-shadow: 0 2px 30px rgba(139,26,42,0.3);
+    transition: padding 0.3s;
+  }
+  .nav-logo-wrap { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+  .nav-logo-img { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; flex-shrink: 0; }
+  .nav-logo-text { display: flex; flex-direction: column; }
+  .nav-logo-text span:first-child { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1.1; }
+  .nav-logo-text span:last-child { font-size: 0.6rem; color: rgba(255,255,255,0.4); letter-spacing: 0.25em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: rgba(255,255,255,0.55); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
+  .nav-cta:hover { background: var(--red-mid) !important; }
+
+  /* ── HERO ── */
+  .hero { min-height: 100vh; background: var(--ink); display: grid; grid-template-columns: 1fr; position: relative; overflow: hidden; background-image: url('./Restaurantbild.webp'); background-size: cover; background-position: center; }
+  .hero-lattice { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.06; background-image: repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px), repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px); }
+  .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 10rem 4.5rem 6rem 7rem; position: relative; z-index: 3; background: rgba(30,10,13,0.5); border-radius: 4px; }
+  .hero-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+  .hero-eyebrow .chin-char { font-family: 'Noto Serif SC','Playfair Display',serif; font-size: 1.4rem; color: var(--gold); line-height: 1; text-shadow: 0 0 20px rgba(196,154,42,0.5); }
+  .hero-eyebrow .sep { width: 1px; height: 28px; background: rgba(196,154,42,0.4); }
+  .hero-eyebrow span:last-child { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem,4.5vw,5rem); line-height: 1.08; color: #fff; font-weight: 400; margin-bottom: 1.5rem; }
+  .hero h1 em { font-style: normal; color: var(--gold); }
+  .hero-desc { color: rgba(255,255,255,0.45); font-size: 1rem; line-height: 1.8; max-width: 380px; margin-bottom: 3rem; font-weight: 300; }
+  .hero-actions { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 0.9rem 2.2rem; text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; transition: all 0.2s; border: 1px solid var(--red-mid); display: inline-block; }
+  .btn-primary:hover { background: var(--red-mid); transform: translateY(-1px); }
+  .btn-ghost { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.6rem; transition: color 0.2s; }
+  .btn-ghost:hover { color: var(--gold); }
+  .btn-ghost::after { content: '→'; font-size: 1rem; }
+
+  .hero-right { position: relative; overflow: hidden; }
+  .hero-right-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .hero-logo-display { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+  .hero-logo-ring { width: 280px; height: 280px; border-radius: 50%; border: 2px solid rgba(196,154,42,0.3); display: flex; align-items: center; justify-content: center; position: relative; animation: slowRotate 60s linear infinite; }
+  .hero-logo-ring::before { content:''; position:absolute; inset:-12px; border-radius:50%; border:1px dashed rgba(196,154,42,0.2); animation:slowRotate 40s linear infinite reverse; }
+  .hero-logo-ring::after { content:'✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦'; position:absolute; inset:-30px; border-radius:50%; font-size:0.5rem; color:rgba(196,154,42,0.25); letter-spacing:1.2rem; display:flex; align-items:center; justify-content:center; }
+  @keyframes slowRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .hero-logo-img { width: 240px; height: 240px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(196,154,42,0.5); box-shadow: 0 0 60px rgba(139,26,42,0.5),0 0 120px rgba(139,26,42,0.2); }
+  .hero-chin-text { font-family: 'Noto Serif SC',serif; font-size: 2rem; color: rgba(196,154,42,0.4); letter-spacing: 0.5em; text-align: center; }
+  .hero-gradient-left { position:absolute; top:0; left:0; bottom:0; width:60%; z-index:2; background:linear-gradient(to right,var(--ink) 40%,transparent); }
+  .hero-gradient-bottom { position:absolute; bottom:0; left:0; right:0; height:200px; z-index:2; background:linear-gradient(to top,var(--ink),transparent); }
+  .hero-lanterns { position:absolute; top:0; right:3rem; z-index:5; display:flex; gap:3rem; }
+  .lantern { display:flex; flex-direction:column; align-items:center; animation:sway 6s ease-in-out infinite; }
+  .lantern:nth-child(2){animation-delay:-2s;animation-duration:7s;margin-top:40px;}
+  .lantern:nth-child(3){animation-delay:-4s;animation-duration:8s;margin-top:20px;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .lantern-cord { width:1px; height:50px; background:rgba(196,154,42,0.4); }
+  .lantern-body { width:22px; height:34px; background:radial-gradient(ellipse,#CC2A2A 0%,#8B1A2A 60%,#5C0E1A 100%); border-radius:50%/30%; border:1px solid rgba(196,154,42,0.5); box-shadow:0 0 10px rgba(200,40,40,0.6),0 0 20px rgba(200,40,40,0.3); position:relative; }
+  .lantern-body::after { content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:1px; height:8px; background:rgba(196,154,42,0.4); }
+  .scroll-hint { position:absolute; bottom:2rem; left:7rem; z-index:10; display:flex; flex-direction:column; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.25); font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; }
+  .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,rgba(196,154,42,0.5),transparent); animation:scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(0.6);opacity:0.4}}
+
+  /* ── QUICK LINKS BAR ── */
+  .quick-links { background: var(--red); display: grid; grid-template-columns: repeat(3,1fr); }
+  .quick-link { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5rem; padding:1.8rem 1rem; text-decoration:none; border-right:1px solid rgba(255,255,255,0.1); transition:background 0.2s; position:relative; overflow:hidden; }
+  .quick-link:last-child { border-right:none; }
+  .quick-link::before { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--gold); transform:scaleX(0); transition:transform 0.3s; }
+  .quick-link:hover { background:rgba(0,0,0,0.15); }
+  .quick-link:hover::before { transform:scaleX(1); }
+  .quick-link-icon { font-size:1.5rem; }
+  .quick-link-chin { font-family:'Noto Serif SC',serif; font-size:0.68rem; color:rgba(255,255,255,0.3); }
+  .quick-link-label { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.8); font-weight:500; }
+
+  /* ── DIVIDER ── */
+  .chin-divider { display:flex; align-items:center; gap:1.5rem; margin:2.5rem 0; }
+  .chin-divider::before,.chin-divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--border-red),transparent); }
+  .chin-divider span { font-family:'Noto Serif SC',serif; font-size:1.1rem; color:var(--red); }
+
+  /* ── SECTION BASE ── */
+  .section-label { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+  .section-label .chin { font-family:'Noto Serif SC',serif; font-size:1.1rem; color:var(--red); }
+  .section-label::after { content:''; flex:0 0 32px; height:1px; background:var(--red); opacity:0.4; }
+  .section-label span:not(.chin) { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--red); }
+  .section-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); font-weight:400; line-height:1.15; color:var(--ink); }
+  .section-title.light { color:#fff; }
+
+  /* ── ABOUT ── */
+  .about { padding:8rem 7rem; background:var(--cream); display:grid; grid-template-columns:1fr 1fr; gap:7rem; align-items:center; position:relative; }
+  .about::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+  .about p { color:var(--mid); font-size:1rem; line-height:1.9; font-weight:300; margin-top:1.2rem; }
+  .about-stats { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2.5rem; }
+  .stat { border-left:3px solid var(--red); padding:0.2rem 0 0.2rem 1.2rem; }
+  .stat-num { font-family:'Playfair Display',serif; font-size:2.2rem; color:var(--red); line-height:1; }
+  .stat-label { font-size:0.75rem; color:var(--mid); margin-top:0.2rem; }
+  .about-visual { position:relative; }
+  .about-logo-display { display:flex; flex-direction:column; align-items:center; background:var(--parchment); border:1px solid var(--border-red); border-radius:4px; padding:3rem 2rem; position:relative; overflow:hidden; }
+  .about-logo-display::before { content:''; position:absolute; inset:8px; border:1px solid rgba(139,26,42,0.12); border-radius:2px; pointer-events:none; }
+  .about-logo-large { width:200px; height:200px; border-radius:50%; border:3px solid var(--red); object-fit:cover; box-shadow:0 8px 40px rgba(139,26,42,0.2); margin-bottom:1.5rem; }
+  .about-logo-subtitle { font-family:'Noto Serif SC',serif; font-size:1.6rem; color:var(--red); letter-spacing:0.3em; text-align:center; line-height:1.4; }
+  .about-logo-en { font-size:0.7rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--mid); margin-top:0.5rem; text-align:center; }
+  .corner-tl,.corner-tr,.corner-bl,.corner-br { position:absolute; width:20px; height:20px; }
+  .corner-tl { top:15px; left:15px; border-top:2px solid var(--red); border-left:2px solid var(--red); }
+  .corner-tr { top:15px; right:15px; border-top:2px solid var(--red); border-right:2px solid var(--red); }
+  .corner-bl { bottom:15px; left:15px; border-bottom:2px solid var(--red); border-left:2px solid var(--red); }
+  .corner-br { bottom:15px; right:15px; border-bottom:2px solid var(--red); border-right:2px solid var(--red); }
+
+  /* ── HOURS ── */
+  .hours-section { background:var(--ink); padding:8rem 7rem; display:grid; grid-template-columns:1fr 1.3fr; gap:7rem; align-items:start; position:relative; }
+  .hours-section::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
+  .hours-info p { color:rgba(255,255,255,0.4); font-size:0.95rem; line-height:1.85; font-weight:300; margin-top:1.5rem; }
+  .address-box { margin-top:2rem; background:rgba(255,255,255,0.04); border:1px solid rgba(139,26,42,0.3); border-radius:4px; padding:1.5rem; }
+  .address-box strong { display:block; font-family:'Playfair Display',serif; font-size:1rem; color:var(--gold); margin-bottom:0.5rem; font-weight:400; }
+  .address-box p { color:rgba(255,255,255,0.4); font-size:0.85rem; margin:0; line-height:1.8; }
+  .hours-table { width:100%; border-collapse:collapse; }
+  .hours-table tr { border-bottom:1px solid rgba(139,26,42,0.2); }
+  .hours-table tr:last-child { border-bottom:none; }
+  .hours-table td { padding:1.1rem 0; font-size:0.88rem; }
+  .hours-table td:first-child { color:rgba(255,255,255,0.4); font-weight:300; }
+  .hours-table td:last-child { color:#fff; text-align:right; font-family:'Playfair Display',serif; font-size:0.95rem; }
+  .closed-badge { font-size:0.68rem; background:rgba(139,26,42,0.2); color:#E07080; padding:0.2rem 0.6rem; border-radius:2px; letter-spacing:0.08em; font-family:'DM Sans',sans-serif; }
+  .hours-cta { margin-top:2.5rem; }
+  .hours-cta a { display:inline-flex; align-items:center; gap:0.6rem; background:var(--red); color:#fff; text-decoration:none; padding:0.85rem 1.8rem; border-radius:2px; font-size:0.78rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:background 0.2s; border:1px solid var(--red-mid); }
+  .hours-cta a:hover { background:var(--red-mid); }
+  .hours-cta a::after { content:'→'; margin-left:0.3rem; }
+
+  /* ── FOOTER ── */
+  footer { background:#0D0508; padding:4rem 7rem 2.5rem; display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:5rem; border-top:1px solid rgba(139,26,42,0.3); }
+  .footer-brand { display:flex; flex-direction:column; gap:1.2rem; }
+  .footer-logo-wrap { display:flex; align-items:center; gap:1rem; }
+  .footer-logo-img { width:55px; height:55px; border-radius:50%; border:2px solid rgba(196,154,42,0.4); object-fit:cover; }
+  .footer-logo-text span:first-child { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold); display:block; }
+  .footer-logo-text span:last-child { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+  .footer-brand p { color:rgba(255,255,255,0.25); font-size:0.85rem; line-height:1.8; font-weight:300; }
+  .footer-col h4 { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--red); margin-bottom:1.5rem; }
+  .footer-col ul { list-style:none; }
+  .footer-col ul li { margin-bottom:0.7rem; }
+  .footer-col ul li a { text-decoration:none; color:rgba(255,255,255,0.3); font-size:0.85rem; font-weight:300; transition:color 0.2s; }
+  .footer-col ul li a:hover { color:var(--gold); }
+  .footer-bottom { background:#0D0508; padding:1.2rem 7rem; border-top:1px solid rgba(139,26,42,0.15); display:flex; justify-content:space-between; align-items:center; }
+  .footer-bottom p { font-size:0.75rem; color:rgba(255,255,255,0.15); font-weight:300; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:960px) {
+    nav { padding:0.8rem 1.5rem; }
+    .nav-links { display:none; }
+    .hero { grid-template-columns:1fr; min-height:100svh; }
+    .hero-left { padding:8rem 2rem 5rem; }
+    .hero-right { position:absolute; inset:0; opacity:0.25; }
+    .hero-gradient-left { width:100%; background:linear-gradient(to right,var(--ink) 60%,transparent); }
+    .hero-lanterns { display:none; }
+    .scroll-hint { left:2rem; }
+    .quick-links { grid-template-columns:1fr; }
+    .quick-link { border-bottom:1px solid rgba(255,255,255,0.1); }
+    .about { grid-template-columns:1fr; gap:3.5rem; padding:5rem 2rem; }
+    .hours-section { grid-template-columns:1fr; gap:3.5rem; padding:5rem 2rem; }
+    footer { grid-template-columns:1fr; gap:3rem; padding:3.5rem 2rem; }
+    .footer-bottom { padding:1.2rem 2rem; flex-direction:column; gap:0.4rem; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo-wrap" href="chinagarden_homepage.html">
+    <img class="nav-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+    <div class="nav-logo-text">
+      <span>China Garden</span>
+      <span>Meschede</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">Über uns</a></li>
+    <li><a href="#hours">Öffnungszeiten</a></li>
+    <li><a href="kontakt.html" class="nav-cta">Reservieren</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero"> 
+  <div class="hero-lattice"></div>
+  <div class="hero-lanterns">
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+    <div class="lantern"><div class="lantern-cord"></div><div class="lantern-body"></div></div>
+  </div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="chin-char"></span>
+      <div class="sep"></div>
+      <span>Chinesische Küche · Meschede</span>
+    </div>
+    <h1>Authentische<br>chinesische Küche<br><em>im China Garden</em></h1>
+    <p class="hero-desc">Erleben Sie im China Garden die Vielfalt der traditionellen chinesischen Küche – frisch zubereitet, mit hochwertigen Zutaten und viel Liebe zum Detail. Von knusprigen Spezialitäten aus dem Wok bis hin zu aromatischen Klassikern für jeden Anlass.</p>
+    <div class="hero-actions">
+      <a href="speisekarte.html" class="btn-primary">Speisekarte ansehen</a>
+      <a href="kontakt.html" class="btn-ghost">Tisch reservieren</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scrollen</span>
+  </div>
+</section>
+
+<!-- QUICK LINKS BAR -->
+<div class="quick-links">
+  <a class="quick-link" href="speisekarte.html">
+    <div class="quick-link-icon">🥢</div>
+    <div class="quick-link-chin">菜单</div>
+    <div class="quick-link-label">Speisekarte</div>
+  </a>
+  <a class="quick-link" href="buffet_seite.html">
+    <div class="quick-link-icon">🍜</div>
+    <div class="quick-link-chin">自助餐</div>
+    <div class="quick-link-label">Buffet-Angebot</div>
+  </a>
+  <a class="quick-link" href="party-service.html">
+    <div class="quick-link-icon">🎉</div>
+    <div class="quick-link-chin">宴会</div>
+    <div class="quick-link-label">Party-Service</div>
+  </a>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div>
+    <div class="section-label"><span class="chin">关于</span><span>Über uns</span></div>
+    <h2 class="section-title">Eine Reise durch die Aromen Chinas</h2>
+    <p>Willkommen im China Garden – Ihrem Ort für authentische chinesische Küche und besondere Genussmomente.</p>
+    <p>Seit unserer Eröffnung stehen wir für frische Zutaten, traditionelle Rezepte und echte Gastfreundschaft. Unsere Küche vereint klassische chinesische Spezialitäten mit moderner Zubereitung für ein vielfältiges Geschmackserlebnis.</p>
+    <p>Ein besonderes Highlight ist unser Show-Cooking-Buffet – frisch, aromatisch und ganz nach Ihrem Geschmack. Mit Platz für bis zu 200 Gäste sind wir ideal für Familienfeiern, Geburtstage, Hochzeiten oder Firmenveranstaltungen.</p>
+    <p>Wir freuen uns darauf, Sie bei uns begrüßen zu dürfen. <br><em style="color:var(--red);font-style:normal;">Ihr China Garden Team</em></p>
+    <div class="chin-divider"><span>✦</span></div>
+    <div class="about-stats">
+      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Jahre Erfahrung</div></div>
+      <div class="stat"><div class="stat-num">80+</div><div class="stat-label">Gerichte auf der Karte</div></div>
+      <div class="stat"><div class="stat-num">6</div><div class="stat-label">Tage die Woche geöffnet</div></div>
+      <div class="stat"><div class="stat-num">★ 4.2</div><div class="stat-label">Durchschnittsbewertung</div></div>
+    </div>
+  </div>
+  <div class="about-visual">
+    <div class="about-logo-display">
+      <div class="corner-tl"></div><div class="corner-tr"></div>
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <img src="./Restaurant_Innen.webp" alt="China Garden Innenraum" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">
+    </div>
+  </div>
+</section>
+
+<!-- HOURS -->
+<section class="hours-section" id="hours">
+  <div class="hours-info">
+    <div class="section-label"><span class="chin" style="color:rgba(196,154,42,0.8);">营业</span><span style="color:rgba(255,255,255,0.4);">Öffnungszeiten</span></div>
+    <h2 class="section-title light">Wann wir für Sie da sind</h2>
+    <p>Wir freuen uns auf Ihren Besuch. Für Reservierungen bitten wir um frühzeitige Anfrage, besonders an Wochenenden und Feiertagen.</p>
+    <div class="address-box">
+      <strong>China Garden Meschede</strong>
+      <p>Kolpingstr. 2 · 59872 Meschede<br>
+      📞 0291 9086372<br>
+      💬 WhatsApp: 0151 7284199<br>
+      Inh.: Konglin Chen</p>
+    </div>
+    <div class="hours-cta">
+      <a href="kontakt.html">Tisch reservieren</a>
+    </div>
+  </div>
+  <div>
+    <table class="hours-table">
+      <tr><td>Mittwoch</td><td><span class="closed-badge">Ruhetag</span></td></tr>
+      <tr><td>Montag – Dienstag & Donnerstag</td><td>11:30 – 15:00 & 17:00 – 22:00</td></tr>
+      <tr><td>Freitag – Sonntag & Feiertage</td><td>11:30 – 15:00 & 17:00 – 23:00</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <div class="footer-logo-wrap">
+      <img class="footer-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+      <div class="footer-logo-text">
+        <span>China Garden</span>
+        <span>Meschede · NRW</span>
+      </div>
+    </div>
+    <p>Authentische chinesische Küche in Meschede – seit über 10 Jahren Ihr Ort für besondere kulinarische Erlebnisse</p>
+  </div>
+  <div class="footer-col">
+    <h4>Navigation</h4>
+    <ul>
+      <li><a href="#about">Über uns</a></li>
+      <li><a href="speisekarte.html">Speisekarte</a></li>
+      <li><a href="buffet_seite.html">Buffet</a></li>
+      <li><a href="party-service.html">Party-Service</a></li>
+      <li><a href="#hours">Öffnungszeiten</a></li>
+      <li><a href="kontakt.html">Reservieren</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Rechtliches</h4>
+    <ul>
+      <li><a href="impressum.html">Impressum</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2026 China Garden Meschede – Alle Rechte vorbehalten.</p>
+  <p style="font-family:'Noto Serif SC',serif;color:rgba(196,154,42,0.3);"></p>
+</div>
+
+<script>
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.style.padding = window.scrollY > 60 ? '0.6rem 4rem' : '0.9rem 4rem';
+  });
+</script>
+</body>
+</html>

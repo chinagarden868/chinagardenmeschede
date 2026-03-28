@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speisekarte – China Garden Meschede</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--red:#8B1A2A;--red-mid:#A82035;--cream:#F9F3E8;--parchment:#F4EAD5;--ink:#1E0A0D;--gold:#C49A2A;--gold-light:#DFB84A;--gold-pale:#F5E5B0;--mid:#7A6060;--border-red:rgba(139,26,42,0.2)}
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden}
+  .stripe{height:6px;background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px)}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 4rem;background:rgba(30,10,13,.97);backdrop-filter:blur(20px);border-bottom:2px solid var(--red);box-shadow:0 2px 30px rgba(139,26,42,.3);transition:padding .3s}
+  .nav-logo-wrap{display:flex;align-items:center;gap:1rem;text-decoration:none}
+  .nav-logo-img { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; flex-shrink: 0; }
+  .nav-logo-text{display:flex;flex-direction:column}
+  .nav-logo-text span:first-child{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);letter-spacing:.05em;line-height:1.1}
+  .nav-logo-text span:last-child{font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:.25em;text-transform:uppercase}
+  .nav-links{display:flex;gap:2rem;list-style:none}
+  .nav-links a{text-decoration:none;color:rgba(255,255,255,.55);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+  .nav-links a:hover{color:var(--gold)}
+  .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
+  .nav-cta:hover { background: var(--red-mid) !important; }
+  .page-hero{background:var(--ink);padding:7rem 7rem 4rem;position:relative;overflow:hidden}
+  .page-hero-lattice{position:absolute;inset:0;pointer-events:none;opacity:.04;background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px)}
+  .page-hero-inner{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem}
+  .page-hero-eyebrow{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+  .page-hero-eyebrow .chin-char{font-family:'Noto Serif SC',serif;font-size:1.4rem;color:var(--gold)}
+  .page-hero-eyebrow .sep{width:1px;height:24px;background:rgba(196,154,42,.4)}
+  .page-hero-eyebrow span:last-child{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+  .page-hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4rem);color:#fff;font-weight:400;line-height:1.1}
+  .page-hero h1 em{font-style:normal;color:var(--gold)}
+  .page-hero-note{color:rgba(255,255,255,.35);font-size:.85rem;line-height:1.7;max-width:340px;font-weight:300;margin-top:1rem}
+  .rice-note{background:rgba(139,26,42,.25);border:1px solid rgba(139,26,42,.5);border-radius:4px;padding:1rem 1.5rem;color:rgba(255,255,255,.7);font-size:.82rem;line-height:1.6;max-width:380px}
+  .rice-note strong{color:var(--gold-light);display:block;margin-bottom:.2rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+  /* TABS */
+  .cat-nav{background:var(--ink);border-bottom:1px solid rgba(139,26,42,.3);position:sticky;top:62px;z-index:50;overflow-x:auto;scrollbar-width:none}
+  .cat-nav::-webkit-scrollbar{display:none}
+  .cat-nav-inner{display:flex;padding:0 7rem;min-width:max-content}
+  .cat-tab{background:transparent;border:none;border-bottom:3px solid transparent;color:rgba(255,255,255,.35);padding:1rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
+  .cat-tab .chin-mini{font-family:'Noto Serif SC',serif;font-size:.85rem;color:rgba(196,154,42,.4);transition:color .2s}
+  .cat-tab:hover{color:rgba(255,255,255,.7)}
+  .cat-tab:hover .chin-mini{color:rgba(196,154,42,.7)}
+  .cat-tab.active{color:var(--gold);border-bottom-color:var(--red)}
+  .cat-tab.active .chin-mini{color:var(--gold)}
+  /* CONTENT */
+  .menu-body{padding:0 7rem 6rem;background:var(--cream)}
+  .menu-section{padding-top:4rem;scroll-margin-top:130px}
+  .section-header{display:flex;align-items:center;gap:2rem;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border-red)}
+  .section-chin{font-family:'Noto Serif SC',serif;font-size:2rem;color:var(--red);opacity:.35}
+  .section-label-small{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--red);opacity:.7;margin-bottom:.2rem}
+  .section-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--ink);font-weight:400}
+  .subsection-title{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--red);display:flex;align-items:center;gap:1rem;margin-bottom:.8rem;margin-top:1.5rem}
+  .subsection-title::before,.subsection-title::after{content:'—';opacity:.5}
+  .items-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(139,26,42,.1);border:1px solid rgba(139,26,42,.1);border-radius:2px;overflow:hidden}
+  .items-grid.single-col{grid-template-columns:1fr}
+  .items-grid.triple-col{grid-template-columns:repeat(3,1fr)}
+  .menu-item{background:var(--cream);padding:1.4rem 1.6rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;transition:background .2s;position:relative}
+  .menu-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);transform:scaleY(0);transition:transform .25s;transform-origin:bottom}
+  .menu-item:hover{background:var(--parchment)}
+  .menu-item:hover::before{transform:scaleY(1)}
+  .item-left{flex:1}
+  .item-num{font-size:.65rem;letter-spacing:.1em;color:rgba(139,26,42,.4);margin-bottom:.15rem;font-weight:500}
+  .item-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);font-weight:500;margin-bottom:.25rem}
+  .item-desc{font-size:.8rem;color:var(--mid);line-height:1.5;font-weight:300}
+  .item-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem}
+  .tag{font-size:.6rem;padding:.1rem .4rem;border-radius:2px;letter-spacing:.08em;font-weight:500}
+  .tag-scharf{background:rgba(139,26,42,.1);color:var(--red)}
+  .tag-veg{background:rgba(60,120,60,.1);color:#3A7A3A}
+  .tag-nuts{background:rgba(196,154,42,.15);color:#8A6A00}
+  .item-price{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--red);white-space:nowrap;flex-shrink:0}
+  .sauces-box{background:var(--parchment);border:1px solid var(--border-red);border-radius:4px;padding:1.2rem 1.5rem;margin-top:1rem}
+  .sauces-label{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem}
+  .sauces-list{display:flex;gap:1.5rem;flex-wrap:wrap}
+  .sauces-list span{font-size:.82rem;color:var(--mid);font-weight:300;display:flex;align-items:center;gap:.3rem}
+  .sauces-list span::before{content:'✦';font-size:.5rem;color:var(--red);opacity:.5}
+  .phoenix-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+  .phoenix-card{background:var(--ink);border:1px solid rgba(139,26,42,.3);border-radius:4px;padding:2rem;position:relative;overflow:hidden;transition:border-color .2s}
+  .phoenix-card:hover{border-color:rgba(196,154,42,.4)}
+  .phoenix-card-num{font-family:'Noto Serif SC',serif;font-size:2.5rem;color:rgba(196,154,42,.1);position:absolute;top:1rem;right:1.2rem;font-weight:600}
+  .phoenix-card-label{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.8rem}
+  .phoenix-card ul{list-style:none}
+  .phoenix-card ul li{font-size:.82rem;color:rgba(255,255,255,.45);padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-weight:300;display:flex;align-items:flex-start;gap:.4rem}
+  .phoenix-card ul li::before{content:'›';color:var(--red);opacity:.6;flex-shrink:0;margin-top:.05rem}
+  .phoenix-card ul li:last-child{border-bottom:none}
+  .phoenix-card-price{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);margin-top:1.2rem}
+  .allergen-section{background:var(--ink);padding:3rem 7rem;border-top:1px solid rgba(139,26,42,.3)}
+  .allergen-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);margin-bottom:1rem;font-weight:400}
+  .allergen-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+  .allergen-block p{font-size:.78rem;color:rgba(255,255,255,.3);line-height:1.8;font-weight:300}
+  .allergen-block strong{display:block;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.4rem;font-weight:400}
+  .footer-strip{background:#0D0508;padding:2rem 7rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(139,26,42,.2)}
+  .footer-strip p{font-size:.75rem;color:rgba(255,255,255,.15)}
+  .footer-strip a{color:var(--red);text-decoration:none;font-size:.78rem}
+  .footer-strip a:hover{color:var(--gold)}
+  .back-top{position:fixed;bottom:2rem;right:2rem;z-index:200;width:44px;height:44px;background:var(--red);border:none;border-radius:2px;color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(10px);transition:all .3s;box-shadow:0 4px 20px rgba(139,26,42,.5)}
+  .back-top.visible{opacity:1;transform:translateY(0)}
+  @media(max-width:960px){
+    nav{padding:.8rem 1.5rem}
+    .cat-nav-inner{padding:0 1.5rem}
+    .page-hero{padding:7rem 1.5rem 3rem}
+    .menu-body{padding:0 1.5rem 4rem}
+    .items-grid,.items-grid.triple-col{grid-template-columns:1fr}
+    .phoenix-grid{grid-template-columns:1fr}
+    .allergen-section{padding:2.5rem 1.5rem}
+    .allergen-grid{grid-template-columns:1fr;gap:1rem}
+    .footer-strip{padding:1.5rem;flex-direction:column;gap:.5rem;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo-wrap" href="chinagarden_homepage.html">
+    <img class="nav-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+    <div class="nav-logo-text">
+      <span>China Garden</span>
+      <span>Meschede</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="chinagarden_homepage.html">Startseite</a></li>
+    <li><a href="buffet_seite.html">Buffet</a></li>
+    <li><a href="party-service.html">Party-Service</a></li>
+    <li><a href="chinagarden_homepage.html#hours">Öffnungszeiten</a></li>
+    <li><a href="kontakt.html" class="nav-cta">Reservieren</a></li>
+  </ul>
+</nav>
+
+<div class="stripe"></div>
+
+<section class="page-hero">
+  <div class="page-hero-lattice"></div>
+  <div class="page-hero-inner">
+    <div>
+      <div class="page-hero-eyebrow">
+        <span class="chin-char">菜单</span>
+        <div class="sep"></div>
+        <span>Vollständige Speisekarte</span>
+      </div>
+      <h1>Unsere<br><em>Speisekarte</em></h1>
+      <p class="page-hero-note">Authentische chinesische Küche – frisch zubereitet mit hochwertigen Zutaten und traditionellen Rezepten.</p>
+    </div>
+    <div class="rice-note">
+      <strong>Hinweis</strong>
+      Alle Hauptgerichte werden mit gekochtem Reis serviert. Gebratener Reis oder gebratene Nudeln auf Wunsch gegen 3,00 € Aufpreis.
+    </div>
+  </div>
+</section>
+
+<!-- TABS – new order -->
+<nav class="cat-nav">
+  <div class="cat-nav-inner">
+    <button class="cat-tab active" data-target="vorspeisen">   <span class="chin-mini">前菜</span> Vorspeisen</button>
+    <button class="cat-tab" data-target="mittagsmenu">         <span class="chin-mini">午餐</span> Mittagsmenü</button>
+    <button class="cat-tab" data-target="huehnerfleisch">      <span class="chin-mini">鸡</span>   Huhn</button>
+    <button class="cat-tab" data-target="ente">                <span class="chin-mini">鸭</span>   Ente</button>
+    <button class="cat-tab" data-target="rind">                <span class="chin-mini">牛</span>   Rind</button>
+    <button class="cat-tab" data-target="schwein">             <span class="chin-mini">猪</span>   Schwein</button>
+    <button class="cat-tab" data-target="meeresfrüchte">       <span class="chin-mini">海鲜</span> Meeresfrüchte</button>
+    <button class="cat-tab" data-target="vegetarisch">         <span class="chin-mini">素</span>   Vegetarisch</button>
+    <button class="cat-tab" data-target="reis">                <span class="chin-mini">饭</span>   Reis &amp; Nudeln</button>
+    <button class="cat-tab" data-target="curry">               <span class="chin-mini">咖喱</span> Curry</button>
+    <button class="cat-tab" data-target="sushi">               <span class="chin-mini">寿司</span> Sushi</button>
+    <button class="cat-tab" data-target="kinder">              <span class="chin-mini">童</span>   Kinder</button>
+    <button class="cat-tab" data-target="phoenix">             <span class="chin-mini">凤</span>   Phönix-Menü</button>
+    <button class="cat-tab" data-target="dessert">             <span class="chin-mini">甜</span>   Dessert</button>
+  </div>
+</nav>
+
+<div class="menu-body">
+
+<!-- VORSPEISEN -->
+<section class="menu-section" id="vorspeisen">
+  <div class="section-header"><div class="section-chin">前菜</div><div><div class="section-label-small">Appetizer</div><div class="section-title">Vorspeisen</div></div></div>
+  <div class="subsection-title">Suppen</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 1</div><div class="item-name">Peking-Gulasch Suppe</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-price">3,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 2</div><div class="item-name">Eierblumen-Suppe</div><div class="item-desc">mit Hühnerfleisch</div></div><div class="item-price">3,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 3</div><div class="item-name">Wan-Tan Suppe</div><div class="item-desc">Teigtaschen gefüllt mit Schweinefleisch</div></div><div class="item-price">3,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 4</div><div class="item-name">Gemüse-Suppe</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">3,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 5</div><div class="item-name">Sam-Sin Suppe</div><div class="item-desc">Hühner, Krabben, Schrimps mit Gemüse</div></div><div class="item-price">3,80 €</div></div>
+  </div>
+  <div class="subsection-title">Salate</div>
+  <div style="font-size:.75rem;color:var(--mid);margin-bottom:.8rem;font-weight:300;">Nr. 12–17 mit Essig-Öl-Dressing oder Joghurt-Dressing-Soße</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 12</div><div class="item-name">Gemischter Salat</div><div class="item-desc">Eisbergsalat, Tomaten, Gurken, Sojabohnensprossen, Krautsalat, Bohnen, Mais und Oliven</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">3,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 14</div><div class="item-name">Hühnerfleisch-Salat</div><div class="item-desc">Eisbergsalat, Hühnerfleisch, Sojabohnensprossen, Krautsalat, Gurken, Tomaten und Oliven</div></div><div class="item-price">5,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 17</div><div class="item-name">Krabben-Salat</div><div class="item-desc">Eisbergsalat, Sojasprossen, Krabben, Krautsalat, Gurken, Tomaten und Oliven</div></div><div class="item-price">6,80 €</div></div>
+  </div>
+  <div class="subsection-title">Beilagen</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 8</div><div class="item-name">Frühlingsrollen</div></div><div class="item-price">3,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 8a</div><div class="item-name">Frühlingsrollen (Gemüsefüllung)</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">3,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 9</div><div class="item-name">Tsing Dao Mini Frühlingsrollen</div><div class="item-desc">8 Stück</div></div><div class="item-price">3,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 10</div><div class="item-name">Krupuk</div><div class="item-desc">Krabbenchips</div></div><div class="item-price">2,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 13</div><div class="item-name">Gebackene Garnelen</div><div class="item-desc">3 Stück mit Süß-Sauer-Soße</div></div><div class="item-price">4,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 15</div><div class="item-name">Hühnerfleisch Sate</div><div class="item-desc">2 Spieße mit Erdnuss-Soße</div><div class="item-tags"><span class="tag tag-nuts">Erdnüsse</span></div></div><div class="item-price">3,50 €</div></div>
+    <div class="menu-item" style="background:var(--parchment);grid-column:1/-1;display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="item-left"><div class="item-num">Nr. 16</div><div class="item-name">Mix-Platte für 2 Personen</div><div class="item-desc">2 Sate Spieße · 4 Stk Mini-Frühlingsrollen · 2 Stk Gebackene Garnelen · 2 Stk Krupuk mit Süß-Sauer-Soße</div></div>
+        <div class="item-price">6,80 €</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MITTAGSMENÜ -->
+<section class="menu-section" id="mittagsmenu">
+  <div class="section-header"><div class="section-chin">午</div><div><div class="section-label-small">Mo – Sa von 11:30–15:00 Uhr (außer an Feiertagen)</div><div class="section-title">Mittagsmenü</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T1</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Hühnerfleisch und Gemüse</div></div><div class="item-price">6,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T2</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">6,90 €</div></div>
+  </div>
+  <div class="subsection-title">Hühnerfleisch</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T3</div><div class="item-name">Hühnerfleisch Chop-Suey</div><div class="item-desc">mit Gemüse</div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T4</div><div class="item-name">Hühnerfleisch nach Sichuan-Art</div><div class="item-desc">mit Gemüse (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T5</div><div class="item-name">Hühnerfleisch</div><div class="item-desc">mit Gemüse und Curry</div></div><div class="item-price">8,00 €</div></div>
+  </div>
+  <div class="subsection-title">Schweinefleisch</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T6</div><div class="item-name">Schweinefleisch Chop-Suey</div><div class="item-desc">mit Gemüse</div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T7</div><div class="item-name">Schweinefleisch mit Ananas</div><div class="item-desc">Süß-Sauer-Soße</div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T8</div><div class="item-name">Schweinefleisch nach Sichuan-Art</div><div class="item-desc">mit Gemüse (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-price">8,00 €</div></div>
+  </div>
+  <div class="subsection-title">Rindfleisch</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T9</div><div class="item-name">Rindfleisch Chop-Suey</div><div class="item-desc">mit Gemüse</div></div><div class="item-price">8,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T10</div><div class="item-name">Rindfleisch nach Sichuan-Art</div><div class="item-desc">mit Gemüse (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-price">8,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T11</div><div class="item-name">Rindfleisch</div><div class="item-desc">mit Zwiebeln</div></div><div class="item-price">8,50 €</div></div>
+  </div>
+  <div class="subsection-title">Knusprig &amp; Gebacken</div>
+  <div class="sauces-box" style="margin-bottom:.8rem;"><div class="sauces-label">Soßen zur Auswahl</div><div class="sauces-list"><span>a. Erdnuss-Soße</span><span>b. Süß-Sauer-Soße</span><span>c. Pikante Soße</span><span>d. Curry-Soße</span></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T12</div><div class="item-name">Knusprige Ente</div><div class="item-desc">mit Gemüse (Soße zur Auswahl)</div></div><div class="item-price">10,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T13</div><div class="item-name">Knuspriges Hühnerfleisch</div><div class="item-desc">mit Gemüse (Soße zur Auswahl)</div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T14</div><div class="item-name">Panierte Hühnerfleischstreifen</div><div class="item-desc">mit Gemüse (Soße zur Auswahl)</div></div><div class="item-price">8,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T15</div><div class="item-name">Gebackenes Fischfilet</div><div class="item-desc">mit Soße zur Auswahl</div></div><div class="item-price">7,50 €</div></div>
+  </div>
+  <div class="subsection-title">Vegetarisch</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">T16</div><div class="item-name">Schätze der Natur</div><div class="item-desc">verschiedenes Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">7,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">T17</div><div class="item-name">Tofu mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">7,80 €</div></div>
+  </div>
+</section>
+
+<!-- HÜHNERFLEISCH -->
+<section class="menu-section" id="huehnerfleisch">
+  <div class="section-header"><div class="section-chin">鸡</div><div><div class="section-label-small">Chicken</div><div class="section-title">Hühnerfleisch</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 19</div><div class="item-name">Hühnerfleisch Chop-Suey</div><div class="item-desc">mit verschiedenem Gemüse</div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 20</div><div class="item-name">Hühnerfleisch Sa-Za</div><div class="item-desc">mit Gemüse und Sa-za Gewürz, Knoblauch</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 21</div><div class="item-name">Hühnerfleisch Gong Bao</div><div class="item-desc">mit Gurke, Paprika, Karotten, Porree und Erdnuss (Knoblauch)</div><div class="item-tags"><span class="tag tag-nuts">Erdnüsse</span><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 22</div><div class="item-name">Hühnerfleisch nach Sichuan-Art</div><div class="item-desc">mit Zwiebeln, Paprika, Bambus und Champignons (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 23</div><div class="item-name">Hühnerfleisch</div><div class="item-desc">mit Brokkoli, Karotten und Knoblauch</div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 25</div><div class="item-name">Paniertes Hühnerfleisch</div><div class="item-desc">mit Gemüse (Süß-Sauer-Soße)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 26</div><div class="item-name">Hühnerfleisch-Sate</div><div class="item-desc">8 Spieße mit Gemüse (Erdnuss-Soße)</div><div class="item-tags"><span class="tag tag-nuts">Erdnüsse</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 27</div><div class="item-name">Gebackenes Hühnerfleisch</div><div class="item-desc">mit Gemüse (Ananas Süß-Sauer-Soße oder Erdnuss-Soße)</div><div class="item-tags"><span class="tag tag-nuts">Erdnüsse</span></div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 28</div><div class="item-name">Eingelegtes, gebackenes Hühnerfleisch</div><div class="item-desc">mit Gemüse in Ananas Süß-Sauer-Soße</div></div><div class="item-price">12,20 €</div></div>
+  </div>
+</section>
+
+<!-- ENTE -->
+<section class="menu-section" id="ente">
+  <div class="section-header"><div class="section-chin">鸭</div><div><div class="section-label-small">Duck</div><div class="section-title">Enten-Gerichte</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 32</div><div class="item-name">Knusprige Ente nach Sichuan-Art</div><div class="item-desc">mit Gemüse (Knoblauch-Soße)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">13,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 33</div><div class="item-name">Knusprige Ente</div><div class="item-desc">mit Gemüse (Ananas Süß-Sauer-Soße)</div></div><div class="item-price">13,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 35</div><div class="item-name">Knusprige Ente nach kantonesischer Art</div><div class="item-desc">mit Gemüse (pikante Soße)</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-price">13,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 37</div><div class="item-name">Ba-Bao-Ya knusprige Ente</div><div class="item-desc">8 Köstlichkeiten</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf / Pikant</span></div></div><div class="item-price">14,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 38</div><div class="item-name">Knusprige Ente nach Shanghai-Art</div><div class="item-desc">mit Gemüse (Erdnuss-Soße)</div><div class="item-tags"><span class="tag tag-nuts">Erdnüsse</span></div></div><div class="item-price">13,90 €</div></div>
+  </div>
+</section>
+
+<!-- RINDFLEISCH -->
+<section class="menu-section" id="rind">
+  <div class="section-header"><div class="section-chin">牛</div><div><div class="section-label-small">Beef</div><div class="section-title">Rindfleisch</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 50</div><div class="item-name">Rindfleisch Sa-Za</div><div class="item-desc">mit Gemüse und Sa-za Gewürz (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 51</div><div class="item-name">Rindfleisch Chop-Suey</div><div class="item-desc">mit verschiedenem Gemüse</div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 52</div><div class="item-name">Rindfleisch nach Sichuan-Art</div><div class="item-desc">mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 53</div><div class="item-name">Rindfleisch</div><div class="item-desc">mit Zwiebeln, Porree und Karotten</div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 54</div><div class="item-name">Rindfleisch</div><div class="item-desc">mit Brokkoli, Karotten und Knoblauch</div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 56</div><div class="item-name">Rindfleisch</div><div class="item-desc">mit schwarze Bohnen Gewürz, Bambus, Paprika, Zwiebeln und Porree</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">12,50 €</div></div>
+  </div>
+</section>
+
+<!-- SCHWEINEFLEISCH -->
+<section class="menu-section" id="schwein">
+  <div class="section-header"><div class="section-chin">猪</div><div><div class="section-label-small">Pork</div><div class="section-title">Schweinefleisch</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 41</div><div class="item-name">Schweinefleisch Chop-Suey</div><div class="item-desc">mit verschiedenem Gemüse</div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 42</div><div class="item-name">Schweinefleisch nach Sichuan-Art</div><div class="item-desc">mit Zwiebeln, Paprika, Bambus, Champignons (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 43</div><div class="item-name">Schweinefleisch Sa-Za</div><div class="item-desc">mit Gemüse und Sa-za Gewürz (Knoblauch)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 46</div><div class="item-name">Gebackenes Schweinefleisch</div><div class="item-desc">in Ananas, Süß-Sauer-Soße</div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item" style="background:var(--parchment);grid-column:1/-1;">
+      <div class="item-left"><div class="item-num">Nr. 47 · Highlight</div><div class="item-name">Acht Köstlichkeiten</div><div class="item-desc">mit Gemüse, Rindfleisch, Hühnerfleisch, Schweinefleisch und Garnelen</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div>
+      <div class="item-price">13,50 €</div>
+    </div>
+  </div>
+</section>
+
+<!-- MEERESFRÜCHTE -->
+<section class="menu-section" id="meeresfrüchte">
+  <div class="section-header"><div class="section-chin">海</div><div><div class="section-label-small">Seafood</div><div class="section-title">Meeresfrüchte</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 63</div><div class="item-name">Gebackenes Fischfilet</div><div class="item-desc">mit Gemüse (Süß-Sauer-Soße)</div></div><div class="item-price">10,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 66</div><div class="item-name">Tintenfisch</div><div class="item-desc">mit schwarzen Bohnen und Gemüse</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">14,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 71</div><div class="item-name">Gebratene Garnelen mit Schale</div><div class="item-desc">10 Stück, mit verschiedenem Gemüse und süßer Chilisauce</div></div><div class="item-price">16,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 72</div><div class="item-name">Gebratene Garnelen nach Gong Bao Art</div><div class="item-desc">mit Zwiebeln, Paprika, Champignons und Bambus (Hoisin-Sauce)</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">16,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 73</div><div class="item-name">Knusprige Gebackene Garnelen</div><div class="item-desc">8 Stück, mit Gemüse (Süß-Sauer-Soße)</div></div><div class="item-price">12,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 77</div><div class="item-name">Gebratene Garnelen mit Gemüse</div></div><div class="item-price">16,90 €</div></div>
+  </div>
+</section>
+
+<!-- VEGETARISCH -->
+<section class="menu-section" id="vegetarisch">
+  <div class="section-header"><div class="section-chin">素</div><div><div class="section-label-small">Vegetarian</div><div class="section-title">Vegetarisch</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 79</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">9,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 80</div><div class="item-name">Gebratene Nudeln</div><div class="item-desc">mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">9,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 81</div><div class="item-name">Chop-Suey Tofu</div><div class="item-desc">Tofu mit verschiedenem Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">10,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 82</div><div class="item-name">Tofu nach Sichuan-Art</div><div class="item-desc">Tofu mit verschiedenem Gemüse, leicht scharf</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-price">10,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 83</div><div class="item-name">Schätze der Natur</div><div class="item-desc">verschiedenes Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">10,50 €</div></div>
+  </div>
+</section>
+
+<!-- REIS & NUDELN -->
+<section class="menu-section" id="reis">
+  <div class="section-header"><div class="section-chin">饭</div><div><div class="section-label-small">Rice &amp; Noodles</div><div class="section-title">Reis- &amp; Nudeln-Gerichte</div></div></div>
+  <div class="subsection-title">Reis-Gerichte</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 85</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Hühnerfleisch und Gemüse</div></div><div class="item-price">10,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 86</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Rindfleisch und Gemüse</div></div><div class="item-price">10,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 87</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Schweinefleisch und Gemüse</div></div><div class="item-price">10,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 88</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Shrimps, Hühnerfleisch, Rindfleisch und Gemüse</div></div><div class="item-price">13,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 89</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Gemüse und Ente (pikante Soße)</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-price">12,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 90</div><div class="item-name">Gebratener Eierreis</div><div class="item-desc">mit Gemüse und gebackenem Hühnerfleisch (Süß-Sauer-Soße)</div></div><div class="item-price">11,90 €</div></div>
+  </div>
+  <div class="subsection-title">Nudeln-Gerichte</div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 91</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Hühnerfleisch und Gemüse</div></div><div class="item-price">10,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 92</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Rindfleisch und Gemüse</div></div><div class="item-price">10,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 93</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Schweinefleisch und Gemüse</div></div><div class="item-price">10,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 95</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Schweine-, Hühner-, Rindfleisch und Gemüse</div></div><div class="item-price">10,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 96</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Garnelen und Gemüse</div></div><div class="item-price">13,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 97</div><div class="item-name">Gebratene Reisnudeln</div><div class="item-desc">mit Rind-, Hühnerfleisch, Schrimps und Gemüse</div></div><div class="item-price">13,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 98</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Gemüse und gebackenem Hühnerfleisch (Süß-Sauer-Soße)</div></div><div class="item-price">11,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 99</div><div class="item-name">Gebratene Eiernudeln</div><div class="item-desc">mit Gemüse und Ente (pikante Soße)</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-price">12,90 €</div></div>
+  </div>
+</section>
+
+<!-- CURRY -->
+<section class="menu-section" id="curry">
+  <div class="section-header"><div class="section-chin">咖</div><div><div class="section-label-small">Curry Dishes</div><div class="section-title">Curry-Gerichte</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 57</div><div class="item-name">Rindfleisch</div><div class="item-desc">mit Gemüse und Curry</div></div><div class="item-price">12,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 58</div><div class="item-name">Schweinefleisch</div><div class="item-desc">mit Gemüse und Curry</div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 59</div><div class="item-name">Hühnerfleisch</div><div class="item-desc">mit Gemüse und Curry</div></div><div class="item-price">12,20 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 60</div><div class="item-name">Garnelen</div><div class="item-desc">mit Gemüse und Curry</div></div><div class="item-price">16,90 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 61</div><div class="item-name">Nasi-Goreng Eierreis</div><div class="item-desc">mit Gemüse, Hühnerfleisch, Schinken, Schrimps und Curry</div></div><div class="item-price">11,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">Nr. 62</div><div class="item-name">Bami-Goreng Eiernudeln</div><div class="item-desc">mit Gemüse, Hühnerfleisch, Schinken, Shrimps und Curry</div></div><div class="item-price">11,50 €</div></div>
+  </div>
+</section>
+
+<!-- SUSHI -->
+<section class="menu-section" id="sushi">
+  <div class="section-header"><div class="section-chin">寿</div><div><div class="section-label-small">Japanisches</div><div class="section-title">Sushi</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">S1</div><div class="item-name">Vegetarische Sushi</div><div class="item-desc">8 Stück</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-price">5,60 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">S2</div><div class="item-name">Meeresfrüchte Sushi</div><div class="item-desc">6 Stück</div></div><div class="item-price">7,90 €</div></div>
+    <div class="menu-item" style="background:var(--parchment);grid-column:1/-1;"><div class="item-left"><div class="item-num">S3</div><div class="item-name">Große Mix Sushi-Teller</div><div class="item-desc">12 Stück · 6 St. Vegetarische + 6 St. Meeresfrüchte</div></div><div class="item-price">12,00 €</div></div>
+  </div>
+</section>
+
+<!-- KINDER -->
+<section class="menu-section" id="kinder">
+  <div class="section-header"><div class="section-chin">童</div><div><div class="section-label-small">Für unsere Kleinen</div><div class="section-title">Kinder-Gerichte</div></div></div>
+  <div class="items-grid">
+    <div class="menu-item"><div class="item-left"><div class="item-num">K1</div><div class="item-name">Paniertes Hühnerfleisch</div><div class="item-desc">mit Reis oder Pommes (mit Süß-Sauer-Soße)</div></div><div class="item-price">6,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">K2</div><div class="item-name">Hühnerfleisch mit Champignons</div><div class="item-desc">und Reis</div></div><div class="item-price">6,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">K3</div><div class="item-name">3 Stk Mini-Frühlingsrollen, Pommes, 1 Hähnchen Spieß</div><div class="item-desc">mit Mayonnaise, Ketchup</div></div><div class="item-price">5,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">K4</div><div class="item-name">Pommes</div><div class="item-desc">mit Ketchup oder Mayonnaise</div></div><div class="item-price">2,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">K5</div><div class="item-name">Gebratene Eiernudeln oder Eierreis</div><div class="item-desc">mit Hühnerfleisch</div></div><div class="item-price">6,50 €</div></div>
+  </div>
+</section>
+
+<!-- PHÖNIX-MENÜ -->
+<section class="menu-section" id="phoenix">
+  <div class="section-header"><div class="section-chin">凤</div><div><div class="section-label-small">For 2 Persons</div><div class="section-title">Phönix-Menü für 2 Personen</div></div></div>
+  <div style="color:var(--mid);font-size:.82rem;margin-bottom:1.5rem;font-weight:300;">Jedes Menü beginnt mit: Peking-Suppe oder Frühlingsrollen und endet mit gebackener Banane mit Honig</div>
+  <div class="phoenix-grid">
+    <div class="phoenix-card"><div class="phoenix-card-num">104</div><div class="phoenix-card-label">Phönix-Menü Nr. 104</div><ul><li>Peking-Suppe oder Frühlingsrollen</li><li>Knusprige Ente mit Gemüse</li><li>Knuspriges Hühnerfleisch (Süß-Sauer-Soße)</li><li>Gebratene Garnelen mit Gemüse (leicht scharf)</li><li>Gebackene Banane mit Honig</li></ul><div class="phoenix-card-price">32,80 €</div></div>
+    <div class="phoenix-card"><div class="phoenix-card-num">105</div><div class="phoenix-card-label">Phönix-Menü Nr. 105</div><ul><li>Peking-Suppe oder Frühlingsrollen</li><li>Knusprige Ente mit Gemüse (pikante Soße)</li><li>Rindfleisch mit Paprika und Bambus (leicht scharf)</li><li>Gebackenes Schweinefleisch in Ananas Süß-Sauer-Soße</li><li>Gebackene Banane mit Honig</li></ul><div class="phoenix-card-price">32,80 €</div></div>
+    <div class="phoenix-card"><div class="phoenix-card-num">106</div><div class="phoenix-card-label">Phönix-Menü Nr. 106</div><ul><li>Peking-Suppe oder Frühlingsrollen</li><li>Knusprige Ente mit Gemüse</li><li>Paniertes Hühnerfleisch (Süß-Sauer-Soße)</li><li>Schweinefleisch mit Gemüse (leicht scharf)</li><li>Gebackene Banane mit Honig</li></ul><div class="phoenix-card-price">32,80 €</div></div>
+    <div class="phoenix-card"><div class="phoenix-card-num">107</div><div class="phoenix-card-label">Phönix-Menü Nr. 107</div><ul><li>Peking-Suppe oder Frühlingsrollen</li><li>Knusprige Ente mit Gemüse (Süß-Sauer-Soße)</li><li>Rindfleisch nach Sichuan-Art mit Zwiebeln, Paprika, Champignons, Bambus (leicht scharf)</li><li>Gebratene Garnelen mit Gemüse</li><li>Gebackene Banane mit Honig</li></ul><div class="phoenix-card-price">32,80 €</div></div>
+  </div>
+</section>
+
+<!-- DESSERT -->
+<section class="menu-section" id="dessert">
+  <div class="section-header"><div class="section-chin">甜</div><div><div class="section-label-small">Für unsere Naschkatzen</div><div class="section-title">Dessert</div></div></div>
+  <div class="items-grid triple-col">
+    <div class="menu-item"><div class="item-left"><div class="item-num">D1</div><div class="item-name">Lychee-Früchte</div></div><div class="item-price">2,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">D2</div><div class="item-name">Götterspeise</div><div class="item-desc">mit Vanille-Soße</div></div><div class="item-price">3,80 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">D3</div><div class="item-name">Gebackene Banane</div><div class="item-desc">mit Honig</div></div><div class="item-price">3,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">D5</div><div class="item-name">Gebackene Ananas</div><div class="item-desc">mit Honig</div></div><div class="item-price">3,00 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">D6</div><div class="item-name">Obstsalat</div></div><div class="item-price">4,50 €</div></div>
+    <div class="menu-item"><div class="item-left"><div class="item-num">D7</div><div class="item-name">Drei Kugeln Eis (verschiedene Sorten)</div></div><div class="item-price">3,50 €</div></div>
+  </div>
+</section>
+
+</div><!-- /menu-body -->
+
+<div class="allergen-section">
+  <div class="allergen-title">Zusatzstoffe &amp; Allergene</div>
+  <div class="allergen-grid">
+    <div class="allergen-block"><strong>Zusatzstoffe</strong><p>1) Farbstoff · 2) Geschmacksverstärker · 3) Konservierungsstoff · 4) Süßungsmitteln · 5) Phosphat · 6) Koffein · 7) Chinin · 8) Antioxidationsmittel · 9) Milcheiweiß · 10) geschwärzt · 11) geschwefelt · 12) gewachst · 13) Nitrat · 14) Taurin · 15) Nitritpökelsalz · 16) Phenylalaninquelle</p></div>
+    <div class="allergen-block"><strong>Allergene</strong><p>a) Hühnchenessenz · b) Krebstiere · c) Eier · d) Fisch · e) Erdnüsse · f) Soja · g) Milch · h) Schalenfrüchte · i) Sellerie · j) Senf · k) Sesamsamen · l) Schwefeldioxid u. Sulfite · m) Lupinen · n) Weichtiere</p></div>
+  </div>
+</div>
+
+<div class="stripe"></div>
+
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Section IDs in exact tab order
+  const ORDER = ['vorspeisen','mittagsmenu','huehnerfleisch','ente','rind','schwein','meeresfrüchte','vegetarisch','reis','curry','sushi','kinder','phoenix','dessert'];
+  const tabs = Array.from(document.querySelectorAll('.cat-tab'));
+
+  // NAV + back-to-top on scroll
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+    nav.style.padding = window.scrollY > 60 ? '.6rem 4rem' : '.9rem 4rem';
+  });
+
+  // TAB CLICK → smooth scroll to section
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.target;
+      const el = document.getElementById(id);
+      if (!el) return;
+      tabs.forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+      el.scrollIntoView({behavior:'smooth'});
+    });
+  });
+
+  // INTERSECTION OBSERVER → highlight tab while scrolling
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const idx = ORDER.indexOf(e.target.id);
+      if (idx < 0) return;
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[idx].classList.add('active');
+      tabs[idx].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    });
+  }, {rootMargin:'-80px 0px -55% 0px', threshold:0});
+
+  document.querySelectorAll('.menu-section').forEach(s => io.observe(s));
+</script>
+</body>
+</html>
