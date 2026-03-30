@@ -98,7 +98,7 @@
     }
   }
 
-  // Listen to both categories
+  
   ["gebraten","frittiert"].forEach(cat => {
     onValue(ref(db, `buffet_dishes/${cat}`), snapshot => {
       const data = snapshot.val();
