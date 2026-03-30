@@ -19,7 +19,7 @@
 
   .stripe { height: 6px; background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
 
-  /* NAV */
+
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 4rem; background: rgba(30,10,13,0.97); backdrop-filter: blur(20px); border-bottom: 2px solid var(--red); box-shadow: 0 2px 30px rgba(139,26,42,0.3); transition: padding 0.3s; }
   .nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
   .nav-logo span:first-child { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1.1; display: block; }
@@ -29,7 +29,7 @@
   .nav-links a:hover { color: var(--gold); }
   .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
 
-  /* PAGE HERO */
+
   .page-hero {
     background: var(--ink); padding: 6rem 7rem 4rem;
     position: relative; overflow: hidden;
@@ -44,10 +44,10 @@
   .page-hero h1 em { font-style: italic; color: var(--gold); }
   .page-hero-note { color: rgba(255,255,255,0.35); font-size: 0.85rem; font-weight: 300; }
 
-  /* MAIN CONTENT */
+
   .impressum-body { padding: 4rem 7rem 6rem; background: var(--cream); }
 
-  /* CONTACT CARD – big prominent one */
+
   .contact-card {
     background: var(--ink); border-radius: 6px;
     border: 1px solid rgba(196,154,42,0.15);
@@ -74,7 +74,7 @@
   .contact-group-value a:hover { color: var(--gold); }
   .contact-group-value.small { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.5); }
 
-  /* HOURS TABLE inside card */
+
   .hours-table { width: 100%; border-collapse: collapse; }
   .hours-table tr { border-bottom: 1px solid rgba(196,154,42,0.08); }
   .hours-table tr:last-child { border-bottom: none; }
@@ -83,7 +83,7 @@
   .hours-table td:last-child { color: rgba(255,255,255,0.7); font-family: 'Playfair Display', serif; font-size: 0.9rem; text-align: right; }
   .closed-tag { background: rgba(139,26,42,0.25); color: #E07080; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 2px; letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif; }
 
-  /* LEGAL SECTIONS */
+
   .legal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
   .legal-block {
     background: var(--parchment); border: 1px solid var(--border-red); border-radius: 4px;
@@ -105,12 +105,12 @@
   .legal-text strong { color: var(--ink); font-weight: 500; }
   .legal-text p + p { margin-top: 0.7rem; }
 
-  /* DIVIDER */
+
   .chin-divider { display: flex; align-items: center; gap: 1.5rem; margin: 2.5rem 0; }
   .chin-divider::before,.chin-divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--border-red),transparent); }
   .chin-divider span { font-family: 'Noto Serif SC', serif; font-size: 1rem; color: var(--red); opacity: 0.45; }
 
-  /* FOOTER */
+
   .footer-bottom { background: #0D0508; padding: 2rem 7rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(139,26,42,0.2); }
   .footer-bottom p { font-size: 0.75rem; color: rgba(255,255,255,0.15); }
   .footer-bottom a { color: var(--red); text-decoration: none; font-size: 0.78rem; transition: color 0.2s; }
@@ -146,7 +146,7 @@
 
 <div class="stripe"></div>
 
-<!-- HERO -->
+
 <section class="page-hero">
   <div class="hero-lattice"></div>
   <div class="hero-inner">
@@ -158,10 +158,10 @@
   </div>
 </section>
 
-<!-- BODY -->
+
 <div class="impressum-body">
 
-  <!-- BIG CONTACT CARD -->
+
   <div class="contact-card">
     <div class="contact-card-header">
       <div class="contact-card-header-text">
@@ -216,7 +216,6 @@
 
   <div class="chin-divider"><span>✦</span></div>
 
-  <!-- LEGAL BLOCKS -->
   <div class="legal-grid">
     <div class="legal-block">
       <div class="legal-block-deco">法</div>
