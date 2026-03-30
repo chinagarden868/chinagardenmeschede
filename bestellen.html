@@ -138,7 +138,7 @@ header h1 {
   margin-top: 3px; letter-spacing: 0.04em;
 }
 
-/* Category tabs */
+/*Kategorien */
 .cat-nav {
   display: flex; overflow-x: auto; gap: 0;
   background: var(--red-deep);
@@ -212,7 +212,7 @@ header h1 {
 .qty-num { font-size: 14px; font-weight: 500; min-width: 16px; text-align: center; color: var(--ink); }
 .qty-num.has-qty { color: var(--red); }
 
-/* Cart bar */
+/* Einkauswaaaaageeen */
 #cart-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--red-deep); border-top: 2px solid var(--gold);
@@ -233,7 +233,7 @@ header h1 {
 }
 #order-btn:disabled { opacity: 0.6; }
 
-/* Success */
+/* Bestellt! Screen */
 #success-screen {
   position: fixed; inset: 0; background: var(--red-deep);
   display: flex; flex-direction: column; align-items: center;
@@ -281,9 +281,9 @@ header h1 {
 </div>
 
 <div id="success-screen">
-  <div class="success-char">  谢谢！</div>
-  <h2>Bestellung aufgegeben!</h2>
-  <p>Die Küche hat deine Bestellung<br>erhalten und bereitet sie vor.</p>
+  <div class="success-char"> 谢谢！</div>
+  <h2>Bestellung  wurde aufgegeben!</h2>
+  <p>Die Küche hat deine Bestellung<br>erhalten und bereitet sie schnellstmöglich vor.</p>
 </div>
 
 <script>
@@ -309,7 +309,7 @@ const MENU = [
   { id:"T16", cat:"Mittagsmenü",  name:"T16. Schätze der Natur",              cn:"素什锦",         desc:"verschiedenes Gemüse (vegetarisch)",               price:7.50 },
   { id:"T17", cat:"Mittagsmenü",  name:"T17. Tofu mit Gemüse",                cn:"豆腐蔬菜",       desc:"vegetarisch",                                     price:7.80 },
 
-  // Suppen
+  // Suppen (für den Fujian Typeeeen)
   { id:"1",  cat:"Suppen",  name:"1. Peking-Gulasch-Suppe",    cn:"北京牛肉汤",     desc:"scharf",                                          price:3.00 },
   { id:"2",  cat:"Suppen",  name:"2. Eierblumen-Suppe",        cn:"蛋花汤",         desc:"mit Hühnerfleisch",                               price:3.00 },
   { id:"3",  cat:"Suppen",  name:"3. Wan-Tan Suppe",           cn:"云吞汤",         desc:"Teigtaschen gefüllt mit Schweinefleisch",         price:3.50 },
@@ -425,7 +425,7 @@ const MENU = [
 
 
 (function buildMenu() {
-  // Prüfe ob Mittagsmenü verfügbar ist (Mo-So 11:30–15:00)
+  // Prüfe ob Mittagsmenü verfügbar ist (Mo-So 11:30–15:00) --> Wenn nein, Mittagsmenü ausblenden
   const now = new Date();
   const day = now.getDay(); 
   const hour = now.getHours();
