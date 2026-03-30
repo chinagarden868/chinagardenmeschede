@@ -32,7 +32,7 @@
 
   onValue(ref(db, "bestellungen"), snapshot => {
     const data = snapshot.val() || {};
-    // Nur "fertig"-Bestellungen, aber lokale Änderungen behalten
+    // Nur "fertig"-Bestellungen, aber lokale Änderungen sollte man beibehalten
     Object.entries(data).forEach(([key, val]) => {
       if (val.status === "fertig") {
         if (!localOrders[key]) localOrders[key] = { key, ...val };
