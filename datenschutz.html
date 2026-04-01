@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="./china-garden-logo-transparent.png">
+<title>Datenschutzerklärung – China Garden Meschede</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #8B1A2A; --red-dark: #5C0E1A; --red-mid: #A82035;
+    --cream: #F9F3E8; --parchment: #F4EAD5;
+    --ink: #1E0A0D; --gold: #C49A2A; --gold-light: #DFB84A; --gold-pale: #F5E5B0;
+    --mid: #7A6060; --border-red: rgba(139,26,42,0.2); --border-gold: rgba(196,154,42,0.3);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem 4rem;
+    background: rgba(30,10,13,0.96); backdrop-filter: blur(20px);
+    border-bottom: 2px solid var(--red); box-shadow: 0 2px 30px rgba(139,26,42,0.3);
+    transition: padding 0.3s;
+  }
+  .nav-logo-wrap { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+  .nav-logo-img { width: 52px; height: 52px; object-fit: contain; flex-shrink: 0; }
+  .nav-logo-text { display: flex; flex-direction: column; }
+  .nav-logo-text span:first-child { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1.1; }
+  .nav-logo-text span:last-child { font-size: 0.6rem; color: rgba(255,255,255,0.4); letter-spacing: 0.25em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: rgba(255,255,255,0.55); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
+  .nav-cta:hover { background: var(--red-mid) !important; }
+
+  .page-header {
+    background: var(--ink);
+    padding: 10rem 7rem 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px),
+      repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px);
+  }
+  .page-header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 6px;
+    background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px);
+  }
+  .page-header-inner { position: relative; z-index: 2; }
+  .section-label { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+  .section-label .chin { font-family:'Noto Serif SC',serif; font-size:1.1rem; color:rgba(196,154,42,0.8); }
+  .section-label::after { content:''; flex:0 0 32px; height:1px; background:var(--gold); opacity:0.4; }
+  .section-label span:not(.chin) { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 400; color: #fff; margin-bottom: 1rem; }
+  .page-header p { color: rgba(255,255,255,0.35); font-size: 0.9rem; font-weight: 300; letter-spacing: 0.05em; }
+
+  .content-wrap { max-width: 860px; margin: 0 auto; padding: 6rem 2rem 8rem; }
+
+  .ds-section { margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border-red); }
+  .ds-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+  .ds-section-num { font-family: 'Noto Serif SC', serif; font-size: 0.75rem; color: var(--red); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
+
+  .ds-section h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin-bottom: 1.2rem; line-height: 1.3; }
+
+  .ds-section p { color: var(--mid); font-size: 0.95rem; line-height: 1.9; font-weight: 300; margin-bottom: 0.9rem; }
+  .ds-section p:last-child { margin-bottom: 0; }
+
+  .ds-section ul { list-style: none; margin: 0.8rem 0; }
+  .ds-section ul li { color: var(--mid); font-size: 0.95rem; line-height: 1.9; font-weight: 300; padding-left: 1.4rem; position: relative; margin-bottom: 0.3rem; }
+  .ds-section ul li::before { content: '✦'; position: absolute; left: 0; color: var(--red); font-size: 0.5rem; top: 0.55rem; }
+
+  .highlight-box { background: var(--parchment); border: 1px solid var(--border-red); border-left: 3px solid var(--red); border-radius: 2px; padding: 1.4rem 1.6rem; margin: 1.5rem 0; }
+  .highlight-box p { font-size: 0.9rem !important; margin-bottom: 0 !important; }
+  .highlight-box strong { color: var(--ink); font-weight: 500; }
+
+  .ai-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(139,26,42,0.08); border: 1px solid var(--border-red); border-radius: 2px; padding: 0.4rem 0.9rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: 1.2rem; font-weight: 500; }
+
+  a { color: var(--red); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .chin-divider { display:flex; align-items:center; gap:1.5rem; margin:3rem 0; }
+  .chin-divider::before,.chin-divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--border-red),transparent); }
+  .chin-divider span { font-family:'Noto Serif SC',serif; font-size:1.1rem; color:var(--red); }
+
+  footer { background:#0D0508; padding:4rem 7rem 2.5rem; display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:5rem; border-top:1px solid rgba(139,26,42,0.3); }
+  .footer-brand { display:flex; flex-direction:column; gap:1.2rem; }
+  .footer-logo-wrap { display:flex; align-items:center; gap:1rem; }
+  .footer-logo-img { width:55px; height:55px; border-radius:50%; border:2px solid rgba(196,154,42,0.4); object-fit:cover; }
+  .footer-logo-text span:first-child { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold); display:block; }
+  .footer-logo-text span:last-child { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+  .footer-brand p { color:rgba(255,255,255,0.25); font-size:0.85rem; line-height:1.8; font-weight:300; }
+  .footer-col h4 { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--red); margin-bottom:1.5rem; }
+  .footer-col ul { list-style:none; }
+  .footer-col ul li { margin-bottom:0.7rem; }
+  .footer-col ul li a { text-decoration:none; color:rgba(255,255,255,0.3); font-size:0.85rem; font-weight:300; transition:color 0.2s; }
+  .footer-col ul li a:hover { color:var(--gold); }
+  .footer-bottom { background:#0D0508; padding:1.2rem 7rem; border-top:1px solid rgba(139,26,42,0.15); display:flex; justify-content:space-between; align-items:center; }
+  .footer-bottom p { font-size:0.75rem; color:rgba(255,255,255,0.15); font-weight:300; }
+
+  @media (max-width:960px) {
+    nav { padding:0.8rem 1.5rem; }
+    .nav-links { display:none; }
+    .page-header { padding:8rem 2rem 4rem; }
+    .content-wrap { padding:4rem 1.5rem 6rem; }
+    footer { grid-template-columns:1fr; gap:3rem; padding:3.5rem 2rem; }
+    .footer-bottom { padding:1.2rem 2rem; flex-direction:column; gap:0.4rem; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo-wrap" href="index.html">
+    <img class="nav-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+    <div class="nav-logo-text">
+      <span>China Garden</span>
+      <span>Meschede</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">Über uns</a></li>
+    <li><a href="index.html#hours">Öffnungszeiten</a></li>
+    <li><a href="kontakt.html" class="nav-cta">Reservieren</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="section-label">
+      <span class="chin">隐私</span>
+      <span>Rechtliches</span>
+    </div>
+    <h1>Datenschutzerklärung</h1>
+    <p>Stand: April 2026 &nbsp;·&nbsp; China Garden Meschede</p>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+  <div class="ds-section">
+    <span class="ds-section-num">01</span>
+    <h2>Verantwortlicher</h2>
+    <p>Verantwortlich für die Verarbeitung personenbezogener Daten auf dieser Website ist:</p>
+    <div class="highlight-box">
+      <p>
+        <strong>China Garden Meschede</strong><br>
+        Inhaber: Konglin Chen<br>
+        Kolpingstr. 2 · 59872 Meschede<br>
+        Telefon: 0291 9086372<br>
+        WhatsApp: 0151 7284199
+      </p>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">02</span>
+    <div class="ai-badge">🤖 KI-Telefonassistent</div>
+    <h2>Hinweis: KI-gestützter Telefonassistent</h2>
+    <p>
+      Eingehende Anrufe bei China Garden Meschede werden von einem <strong>KI-gestützten Telefonassistenten</strong> entgegengenommen. Zu Beginn jedes Gesprächs werden Sie automatisch darauf hingewiesen, dass Sie mit einer KI sprechen.
+    </p>
+    <p>Im Rahmen des Telefongesprächs können folgende personenbezogene Daten verarbeitet werden:</p>
+    <ul>
+      <li>Sprachdaten (Inhalt des Gesprächs)</li>
+      <li>Telefonnummer (sofern übermittelt)</li>
+      <li>Angaben zu Reservierungen oder Bestellungen (Name, Personenanzahl, Uhrzeit etc.)</li>
+    </ul>
+    <p>
+      Die Verarbeitung erfolgt auf Grundlage von <strong>Art. 6 Abs. 1 lit. b DSGVO</strong> (Vertragsanbahnung bzw. -erfüllung) sowie <strong>Art. 6 Abs. 1 lit. f DSGVO</strong> (berechtigtes Interesse an telefonischer Erreichbarkeit).
+    </p>
+    <div class="highlight-box">
+      <p>
+        <strong>Hinweis zur Datenspeicherung:</strong> Bitte entnehmen Sie der Datenschutzerklärung Ihres KI-Telefonieanbieters, ob und wie lange Gesprächsdaten gespeichert werden, und ergänzen Sie diese Information hier entsprechend.
+      </p>
+    </div>
+    <p>
+      Sollten Gespräche aufgezeichnet werden, werden Sie zu Beginn des Anrufs ausdrücklich darauf hingewiesen.
+    </p>
+  </div>
+
+  <div class="chin-divider"><span>✦</span></div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">03</span>
+    <h2>Nutzung dieser Website</h2>
+    <p>
+      Beim Besuch unserer Website werden durch den Hosting-Anbieter technisch notwendige Daten automatisch in Server-Logfiles gespeichert:
+    </p>
+    <ul>
+      <li>IP-Adresse des anfragenden Geräts</li>
+      <li>Datum und Uhrzeit des Zugriffs</li>
+      <li>Name und URL der abgerufenen Seite</li>
+      <li>Verwendeter Browser und Betriebssystem</li>
+    </ul>
+    <p>
+      Diese Daten werden ausschließlich zur Sicherstellung des technischen Betriebs verwendet und nicht mit anderen Datenquellen zusammengeführt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+    </p>
+  </div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">04</span>
+    <h2>Kontaktaufnahme & Reservierungen</h2>
+    <p>
+      Wenn Sie uns per Telefon, WhatsApp oder Kontaktformular kontaktieren, werden die übermittelten Daten (z. B. Name, Telefonnummer, Anliegen) zur Bearbeitung Ihrer Anfrage gespeichert. Diese Daten werden nicht an Dritte weitergegeben und nach Erledigung gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten bestehen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+    </p>
+  </div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">05</span>
+    <h2>Ihre Rechte als betroffene Person</h2>
+    <p>Sie haben gegenüber uns folgende Rechte bezüglich Ihrer personenbezogenen Daten:</p>
+    <ul>
+      <li><strong>Auskunft</strong> – Sie können erfahren, welche Daten wir über Sie verarbeiten</li>
+      <li><strong>Berichtigung</strong> – unrichtige Daten können korrigiert werden</li>
+      <li><strong>Löschung</strong> – Sie können die Löschung Ihrer Daten verlangen</li>
+      <li><strong>Einschränkung</strong> – die Verarbeitung kann eingeschränkt werden</li>
+      <li><strong>Widerspruch</strong> – Sie können der Verarbeitung widersprechen</li>
+      <li><strong>Datenübertragbarkeit</strong> – Sie können Ihre Daten in einem gängigen Format erhalten</li>
+    </ul>
+    <p>
+      Zur Ausübung Ihrer Rechte: Telefon <strong>0291 9086372</strong> oder postalisch an Kolpingstr. 2, 59872 Meschede.
+    </p>
+  </div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">06</span>
+    <h2>Beschwerderecht bei der Aufsichtsbehörde</h2>
+    <p>Sie haben das Recht, sich bei der zuständigen Datenschutz-Aufsichtsbehörde zu beschweren:</p>
+    <div class="highlight-box">
+      <p>
+        <strong>Landesbeauftragte für Datenschutz und Informationsfreiheit NRW</strong><br>
+        Postfach 20 04 44 · 40102 Düsseldorf<br>
+        <a href="https://www.ldi.nrw.de" target="_blank">www.ldi.nrw.de</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <span class="ds-section-num">07</span>
+    <h2>Änderungen dieser Datenschutzerklärung</h2>
+    <p>
+      Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen, insbesondere bei Änderungen der eingesetzten Technologien oder gesetzlichen Anforderungen. Die jeweils aktuelle Version ist auf dieser Seite abrufbar.
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <div class="footer-logo-wrap">
+      <img class="footer-logo-img" src="./china-garden-logo-transparent.png" alt="China Garden Logo">
+      <div class="footer-logo-text">
+        <span>China Garden</span>
+        <span>Meschede · NRW</span>
+      </div>
+    </div>
+    <p>Authentische chinesische Küche in Meschede – seit über 10 Jahren Ihr Ort für besondere kulinarische Erlebnisse</p>
+  </div>
+  <div class="footer-col">
+    <h4>Navigation</h4>
+    <ul>
+      <li><a href="index.html#about">Über uns</a></li>
+      <li><a href="speisekarte.html">Speisekarte</a></li>
+      <li><a href="buffet_seite.html">Buffet</a></li>
+      <li><a href="party-service.html">Party-Service</a></li>
+      <li><a href="index.html#hours">Öffnungszeiten</a></li>
+      <li><a href="kontakt.html">Reservieren</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Rechtliches</h4>
+    <ul>
+      <li><a href="impressum.html">Impressum</a></li>
+      <li><a href="datenschutz.html" style="color:rgba(196,154,42,0.6);">Datenschutz</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2026 China Garden Meschede – Alle Rechte vorbehalten.</p>
+</div>
+
+<script>
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.style.padding = window.scrollY > 60 ? '0.6rem 4rem' : '0.9rem 4rem';
+  });
+</script>
+</body>
+</html>
