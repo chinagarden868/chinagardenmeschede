@@ -13,6 +13,7 @@
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, update }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
   const firebaseConfig = {
     apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
     authDomain:        "china-garden-meschede.firebaseapp.com",
@@ -26,7 +27,6 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  // Ton für Bestellungen
   function playSound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     [0, 0.15, 0.3].forEach((delay, i) => {
@@ -42,7 +42,7 @@
     });
   }
 
-  // Buffet- Nachfüllen
+  // ── Buffet ──────────────────────────────────────────────────
   let prevBuffetCount = null;
   onValue(ref(db, "buffet"), snapshot => {
     const data = snapshot.val() || {};
@@ -62,43 +62,26 @@
   function renderBuffet(requests) {
     const section = document.getElementById("buffet-section");
     const badge   = document.getElementById("buffet-badge");
-
     badge.textContent = requests.length;
     badge.style.display = requests.length > 0 ? "flex" : "none";
     section.style.display = requests.length > 0 ? "block" : "none";
-
     const gebraten  = requests.filter(r => r.cat !== "frittiert");
     const frittiert = requests.filter(r => r.cat === "frittiert");
-
     function makeCards(list) {
       return list.map(r => {
         const levelColor = r.level === "大量" ? "#C0152A" : r.level === "中量" ? "#C9982A" : "#3A8C5C";
-        return `
-        <div class="buffet-card">
+        return `<div class="buffet-card">
           <div class="buffet-name">${r.name}</div>
           <div class="buffet-level" style="color:${levelColor}">${r.level}</div>
           <button class="buffet-done" onclick="markBuffetFertig('${r.key}')">✓</button>
         </div>`;
       }).join("");
     }
-
     document.getElementById("buffet-gebraten").innerHTML = makeCards(gebraten);
     document.getElementById("buffet-frittiert").innerHTML = makeCards(frittiert);
   }
 
-  // Bestellungen
-  let prevOrderCount = null;
-  onValue(ref(db, "bestellungen"), snapshot => {
-    const data = snapshot.val() || {};
-    const orders = Object.entries(data)
-      .map(([key, val]) => ({ key, ...val }))
-      .filter(o => o.status !== "fertig" && o.status !== "bezahlt")
-      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-    if (prevOrderCount !== null && orders.length > prevOrderCount) playSound();
-    prevOrderCount = orders.length;
-    renderOrders(orders);
-  });
-
+  // ── Bestellungen + Take-Away ─────────────────────────────────
   const CN = {
     "T1":"炒蛋面","T2":"炒蛋饭","T3":"杂烩鸡肉","T4":"四川鸡肉","T5":"咖喱鸡肉",
     "T6":"杂烩猪肉","T7":"菠萝猪肉","T8":"四川猪肉","T9":"杂烩牛肉","T10":"四川牛肉",
@@ -106,8 +89,7 @@
     "T16":"素什锦","T17":"豆腐蔬菜",
     "1":"北京牛肉汤","2":"蛋花汤","3":"云吞汤","4":"蔬菜汤","5":"三鲜汤",
     "8":"春卷","8a":"素春卷","9":"青岛小春卷","10":"虾片","13":"炸虾",
-    "15":"鸡肉沙爹","16":"双人拼盘",
-    "12":"什锦沙拉","14":"鸡肉沙拉","17":"蟹肉沙拉",
+    "15":"鸡肉沙爹","16":"双人拼盘","12":"什锦沙拉","14":"鸡肉沙拉","17":"蟹肉沙拉",
     "19":"杂烩鸡肉","20":"沙茶鸡肉","21":"宫保鸡丁","22":"四川鸡肉","23":"西兰花鸡肉",
     "25":"炸鸡肉","26":"鸡肉沙爹","27":"甜酸炸鸡","28":"菠萝甜酸鸡",
     "32":"四川脆皮鸭","33":"菠萝脆皮鸭","35":"广式脆皮鸭","37":"八宝鸭","38":"上海脆皮鸭",
@@ -124,9 +106,47 @@
     "D1":"荔枝","D2":"果冻","D3":"蜜糖炸香蕉","D5":"蜜糖炸菠萝","D6":"水果沙拉","D7":"三球冰淇淋"
   };
 
+  let prevOrderCount   = null;
+  let prevTakeawayCount = null;
+
+  onValue(ref(db, "bestellungen"), snapshot => {
+    const data = snapshot.val() || {};
+    const all = Object.entries(data)
+      .map(([key, val]) => ({ key, ...val }))
+      .filter(o => o.status !== "fertig" && o.status !== "bezahlt")
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    // Tisch-Bestellungen: alles ohne "📞" im Tisch-Label
+    const orders   = all.filter(o => !String(o.tisch).includes("📞"));
+    // Take-Away: alles mit "📞"
+    const takeaway = all.filter(o => String(o.tisch).includes("📞"));
+
+    if (prevOrderCount !== null && orders.length > prevOrderCount) playSound();
+    if (prevTakeawayCount !== null && takeaway.length > prevTakeawayCount) playSound();
+    prevOrderCount   = orders.length;
+    prevTakeawayCount = takeaway.length;
+
+    renderOrders(orders);
+    renderTakeaway(takeaway);
+  });
+
   window.markFertig = function(key) {
     update(ref(db, "bestellungen/" + key), { status: "fertig" });
   };
+  window.markTakeawayFertig = function(key) {
+    update(ref(db, "bestellungen/" + key), { status: "fertig" });
+  };
+
+  function itemsHtml(items) {
+    return (items || []).map(item => `
+      <div class="item-row">
+        <span class="item-qty">×${item.qty}</span>
+        <span class="item-name">
+          <span class="item-cn">${CN[item.id] ? CN[item.id] : item.name}</span>
+        </span>
+        <span class="item-price">${item.price > 0 ? (item.qty * item.price).toFixed(2) + " €" : ""}</span>
+      </div>`).join("");
+  }
 
   function renderOrders(orders) {
     const grid  = document.getElementById("orders-grid");
@@ -144,12 +164,9 @@
     empty.style.display = "none";
 
     grid.innerHTML = orders.map(order => {
-      const total = (order.items || [])
-        .reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
-      const time = order.timestamp
-        ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" })
-        : "–";
-
+      const total = (order.items || []).reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
+      const time  = order.timestamp
+        ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" }) : "–";
       return `
       <div class="order-card ${order.status === "neu" ? "is-new" : ""}">
         <div class="card-head">
@@ -162,21 +179,44 @@
             <span class="order-time">${time}</span>
           </div>
         </div>
-        <div class="items-list">
-          ${(order.items || []).map(item => `
-            <div class="item-row">
-              <span class="item-qty">×${item.qty}</span>
-              <span class="item-name">
-                ${CN[item.id] ? `<span class="item-cn">${CN[item.id]}</span>` : `<span class="item-cn">${item.name}</span>`}
-              </span>
-              <span class="item-price">${(item.qty * item.price).toFixed(2)} €</span>
-            </div>`).join("")}
-        </div>
+        <div class="items-list">${itemsHtml(order.items)}</div>
         <div class="card-foot">
           <span class="total">合计 ${total} €</span>
-          <button class="fertig-btn" onclick="markFertig('${order.key}')">
-            完成 · Fertig
-          </button>
+          <button class="fertig-btn" onclick="markFertig('${order.key}')">完成 · Fertig</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderTakeaway(orders) {
+    const section = document.getElementById("takeaway-section");
+    const list    = document.getElementById("takeaway-list");
+    const badge   = document.getElementById("takeaway-badge");
+
+    badge.textContent = orders.length;
+    badge.style.display = orders.length > 0 ? "flex" : "none";
+    section.style.display = orders.length > 0 ? "block" : "none";
+
+    list.innerHTML = orders.map(order => {
+      const time = order.timestamp
+        ? new Date(order.timestamp).toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" }) : "–";
+      return `
+      <div class="ta-card ${order.status === "neu" ? "is-new" : ""}">
+        <div class="ta-head">
+          <div class="ta-icon">📞</div>
+          <div class="ta-info">
+            <div class="ta-name">${order.kundenname || "Telefonkunde"}</div>
+            <div class="ta-tel">${order.telefon || ""}</div>
+          </div>
+          <div class="ta-right">
+            ${order.status === "neu" ? '<span class="new-badge">新 NEU</span>' : ''}
+            <span class="order-time">${time}</span>
+          </div>
+        </div>
+        <div class="items-list">${itemsHtml(order.items)}</div>
+        ${order.notiz ? `<div class="ta-notiz">${order.notiz}</div>` : ""}
+        <div class="ta-foot">
+          <button class="fertig-btn ta-btn" onclick="markTakeawayFertig('${order.key}')">完成 · Fertig</button>
         </div>
       </div>`;
     }).join("");
@@ -193,10 +233,11 @@
   --gold-l:   #F0D080;
   --gold-dim: rgba(201,152,42,0.3);
   --red:      #C0152A;
-  --red-mid:  #8B0D1E;
   --ink:      #F2E8D8;
   --muted:    #8A7060;
   --green:    #3A8C5C;
+  --blue:     #2A6FA8;
+  --blue-dim: rgba(42,111,168,0.25);
   --r: 14px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -219,7 +260,6 @@ header {
 }
 .header-left { display: flex; align-items: center; gap: 14px; }
 .h-icon { font-size: 26px; }
-.h-titles {}
 .h-cn {
   font-family: 'Noto Serif SC', serif;
   font-size: 22px; font-weight: 600;
@@ -243,141 +283,204 @@ header {
   width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; font-weight: 500;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  color: var(--muted);
+  background: var(--surface2); border: 1.5px solid var(--border); color: var(--muted);
   transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
-#count-badge[data-active="1"] {
-  background: var(--red);
-  border-color: var(--red);
-  color: white;
+#count-badge[data-active="1"] { background: var(--red); border-color: var(--red); color: white; }
+
+/* ── Haupt-Layout: zwei Spalten ────────────────────────────── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 0;
+  min-height: calc(100dvh - 60px);
 }
-/* ── Buffet ── */
-#buffet-section { display: none; padding: 16px 24px 0; }
+.col-tisch {
+  border-right: 1.5px solid var(--border);
+  padding-bottom: 40px;
+}
+.col-takeaway {
+  background: #0C0F14;
+  padding-bottom: 40px;
+}
+
+/* ── Spalten-Header ─────────────────────────────────────────── */
+.col-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  position: sticky; top: 61px; z-index: 5;
+}
+.col-tisch .col-header { background: var(--surface2); }
+.col-takeaway .col-header { background: #111520; }
+.col-header-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 15px; font-weight: 600;
+}
+.col-tisch .col-header-title { color: var(--gold); }
+.col-takeaway .col-header-title { color: #6aaee8; }
+.col-badge {
+  display: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 12px; align-items: center; justify-content: center;
+  font-weight: 600; color: white;
+}
+#takeaway-badge { background: var(--blue); }
+#buffet-badge   { background: var(--red); }
+
+/* ── Buffet ─────────────────────────────────────────────────── */
+#buffet-section { display: none; padding: 16px 20px 0; }
 .buffet-header {
   font-family: 'Noto Serif SC', serif;
-  font-size: 16px; color: var(--gold);
-  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  font-size: 15px; color: var(--gold);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
 }
-#buffet-badge {
-  display: none; background: var(--red); color: white;
-  width: 24px; height: 24px; border-radius: 50%;
-  font-size: 13px; align-items: center; justify-content: center;
-}
-.buffet-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.buffet-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .buffet-col { background: var(--surface2); border-radius: 10px; padding: 10px; }
-.buffet-col-title { font-family: 'Noto Serif SC', serif; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
-.buffet-list { display: flex; flex-direction: column; gap: 8px; }
+.buffet-col-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.buffet-list { display: flex; flex-direction: column; gap: 7px; }
 .buffet-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 14px;
-  display: flex; align-items: center; gap: 10px;
+  border-radius: 10px; padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
 }
-.buffet-name { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--ink); }
-.buffet-level { font-size: 14px; font-weight: 500; }
+.buffet-name { font-family: 'Noto Serif SC', serif; font-size: 16px; color: var(--ink); flex: 1; }
+.buffet-level { font-size: 13px; font-weight: 500; }
 .buffet-done {
   background: var(--green); color: white; border: none;
-  width: 30px; height: 30px; border-radius: 8px;
-  font-size: 16px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 7px;
+  font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
-.buffet-done:active { opacity: 0.7; }
-/* Ende Buffet */
+
+/* ── Tisch-Bestellungen ─────────────────────────────────────── */
+#empty-state {
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
-  min-height: 65vh; gap: 16px; text-align: center;
+  min-height: 50vh; gap: 12px; text-align: center;
 }
 .empty-char {
   font-family: 'Noto Serif SC', serif;
-  font-size: 72px; color: var(--gold);
-  opacity: 0.15; line-height: 1;
+  font-size: 56px; color: var(--gold); opacity: 0.12; line-height: 1;
 }
-.empty-text {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 20px; color: var(--muted); font-weight: 500;
-}
-.empty-sub { font-size: 14px; color: var(--muted); opacity: 0.6; }
+.empty-text { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--muted); }
+.empty-sub  { font-size: 13px; color: var(--muted); opacity: 0.5; }
 #orders-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 18px; padding: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px; padding: 20px;
 }
 .order-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r); overflow: hidden;
   animation: slideIn 0.3s ease;
 }
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.order-card.is-new {
-  border-color: var(--gold-dim);
-  box-shadow: 0 0 0 1px var(--gold-dim) inset;
-}
+@keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.order-card.is-new { border-color: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold-dim) inset; }
 .card-head {
   display: flex; justify-content: space-between; align-items: flex-start;
-  padding: 16px 20px 14px;
+  padding: 14px 18px 12px;
   border-bottom: 1px solid var(--border);
   background: var(--surface2);
 }
 .tisch-nr {
   font-family: 'Noto Serif SC', serif;
-  font-size: 32px; font-weight: 600;
-  color: var(--gold-l); line-height: 1;
-  letter-spacing: 0.05em;
+  font-size: 30px; font-weight: 600;
+  color: var(--gold-l); line-height: 1; letter-spacing: 0.05em;
 }
-.tisch-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
-.head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.tisch-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
 .new-badge {
   font-size: 11px; font-weight: 500;
   background: var(--red); color: white;
-  padding: 3px 9px; border-radius: 4px;
-  letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 4px; letter-spacing: 0.06em;
 }
-.order-time { font-size: 13px; color: var(--muted); }
-.items-list { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
-.item-row { display: flex; align-items: baseline; gap: 10px; }
-.item-qty {
-  font-size: 14px; font-weight: 500; color: var(--red);
-  min-width: 28px; flex-shrink: 0;
-}
-.item-name { flex: 1; font-size: 20px; font-weight: 400; color: var(--ink); line-height: 1.4; display: flex; flex-direction: column; gap: 2px; }
-.item-cn { font-family: 'Noto Serif SC', serif; font-size: 22px; color: var(--gold-l); letter-spacing: 0.05em; }
-.item-de { font-size: 14px; color: var(--muted); }
-.item-price { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.order-time { font-size: 12px; color: var(--muted); }
+.items-list { padding: 12px 18px; display: flex; flex-direction: column; gap: 9px; }
+.item-row { display: flex; align-items: baseline; gap: 8px; }
+.item-qty { font-size: 14px; font-weight: 500; color: var(--red); min-width: 26px; flex-shrink: 0; }
+.item-name { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.item-cn { font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--gold-l); letter-spacing: 0.04em; }
+.item-price { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .card-foot {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 20px 18px;
-  border-top: 1px solid var(--border);
-  margin-top: 2px;
+  padding: 12px 18px 16px; border-top: 1px solid var(--border);
 }
-.total {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 17px; color: var(--gold); font-weight: 500;
-}
+.total { font-family: 'Noto Serif SC', serif; font-size: 16px; color: var(--gold); font-weight: 500; }
 .fertig-btn {
   background: linear-gradient(135deg, #2D6A4F, #1f4f3a);
   color: white; border: none;
-  padding: 13px 26px; border-radius: 10px;
-  font-size: 18px; font-weight: 500;
+  padding: 11px 22px; border-radius: 10px;
+  font-size: 16px; font-weight: 500;
   font-family: 'Noto Sans SC', sans-serif;
   cursor: pointer; letter-spacing: 0.05em;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.1s, opacity 0.15s;
 }
 .fertig-btn:active { transform: scale(0.97); opacity: 0.85; }
-@media (min-width: 768px) {
-  .tisch-nr   { font-size: 40px; }
-  .item-name  { font-size: 22px; }
-  .fertig-btn { font-size: 20px; padding: 15px 32px; }
+
+/* ── Take-Away Spalte ───────────────────────────────────────── */
+#takeaway-section { display: none; }
+#takeaway-list { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+
+.ta-card {
+  background: #131926;
+  border: 1px solid #1e2d45;
+  border-radius: var(--r); overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+.ta-card.is-new {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px rgba(42,111,168,0.4) inset;
+}
+.ta-head {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  background: #0e1520;
+  border-bottom: 1px solid #1e2d45;
+}
+.ta-icon { font-size: 22px; line-height: 1; padding-top: 2px; }
+.ta-info { flex: 1; }
+.ta-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; color: #a8d4f5; font-weight: 600;
+}
+.ta-tel { font-size: 12px; color: #4a7090; margin-top: 2px; }
+.ta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.ta-notiz {
+  font-size: 11px; color: #4a7090;
+  padding: 6px 14px; border-top: 1px solid #1a2535;
+  font-style: italic;
+}
+.ta-foot {
+  padding: 10px 14px 14px;
+  border-top: 1px solid #1e2d45;
+}
+.ta-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #1a4a7a, #0f2d4f);
+  font-size: 15px; padding: 11px;
+}
+
+/* ── Takeaway leer ──────────────────────────────────────────── */
+.ta-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 200px; gap: 8px; text-align: center;
+  padding: 30px 20px;
+}
+.ta-empty-icon { font-size: 36px; opacity: 0.15; }
+.ta-empty-text { font-size: 13px; color: var(--muted); opacity: 0.5; }
+
+@media (max-width: 768px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .col-takeaway { border-top: 2px solid var(--blue); }
 }
 </style>
 </head>
 <body>
 <div class="top-strip"></div>
+
 <header>
   <div class="header-left">
     <span class="h-icon">🍜</span>
@@ -395,29 +498,55 @@ header {
   </div>
 </header>
 
-<div id="buffet-section">
-  <div class="buffet-header">
-    🍽 自助餐 - Buffet
-    <span id="buffet-badge"></span>
-  </div>
-  <div class="buffet-cols">
-    <div class="buffet-col">
-      <div class="buffet-col-title">🥢 炒菜 · Gebratenes</div>
-      <div id="buffet-gebraten" class="buffet-list"></div>
+<div class="main-layout">
+
+  <!-- ── Linke Spalte: Buffet + Tischbestellungen ── -->
+  <div class="col-tisch">
+
+    <div id="buffet-section">
+      <div class="buffet-header">
+        🍽 自助餐 · Buffet
+        <span id="buffet-badge" class="col-badge"></span>
+      </div>
+      <div class="buffet-cols">
+        <div class="buffet-col">
+          <div class="buffet-col-title">🥢 炒菜 · Gebratenes</div>
+          <div id="buffet-gebraten" class="buffet-list"></div>
+        </div>
+        <div class="buffet-col">
+          <div class="buffet-col-title">🍤 炸菜 · Frittiertes</div>
+          <div id="buffet-frittiert" class="buffet-list"></div>
+        </div>
+      </div>
     </div>
-    <div class="buffet-col">
-      <div class="buffet-col-title">🍤 炸菜 · Frittiertes</div>
-      <div id="buffet-frittiert" class="buffet-list"></div>
+
+    <div id="empty-state">
+      <div class="empty-char">无</div>
+      <div class="empty-text">Keine offenen Bestellungen</div>
+      <div class="empty-sub">Neue Bestellungen erscheinen hier :)</div>
+    </div>
+
+    <div id="orders-grid"></div>
+  </div>
+
+  <!-- ── Rechte Spalte: Take-Away ── -->
+  <div class="col-takeaway">
+    <div class="col-header">
+      <span style="font-size:18px">📞</span>
+      <span class="col-header-title">外卖 · Take-Away</span>
+      <span id="takeaway-badge" class="col-badge"></span>
+    </div>
+
+    <div id="takeaway-section">
+      <div id="takeaway-list"></div>
+    </div>
+
+    <div class="ta-empty" id="takeaway-empty">
+      <div class="ta-empty-icon">📞</div>
+      <div class="ta-empty-text">Keine Take-Away Bestellungen</div>
     </div>
   </div>
+
 </div>
-  
-<div id="empty-state">
-  <div class="empty-char"> 无 - 可以休息一会 :D </div>
-  <div class="empty-text"> Gerade keine offenen Bestellungen - Etwas ausruhen :D </div>
-  <div class="empty-sub"> Neue Bestellungen erscheinen hier :) </div>
-</div>
-  
-<div id="orders-grid"></div>
 </body>
 </html>
