@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="./china-garden-logo-transparent.png">
+<title>Take-Away · 外卖 · China Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, push, set }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCX_VIIy83XUlEWWINRbNZusCVVtkhZvdw",
+    authDomain:        "china-garden-meschede.firebaseapp.com",
+    databaseURL:       "https://china-garden-meschede-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "china-garden-meschede",
+    storageBucket:     "china-garden-meschede.firebasestorage.app",
+    messagingSenderId: "437982133482",
+    appId:             "1:437982133482:web:135c01db3a84e2b5feab93"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // ── Wartezeitschätzung anhand offener Bestellungen ─────────
+  function calcWaitTime(openCount) {
+    if (openCount <= 3)  return { label: "15–20 Min.", level: "low",    text: "Wenig los – schnelle Zubereitung" };
+    if (openCount <= 7)  return { label: "20–25 Min.", level: "medium", text: "Normales Aufkommen" };
+    return               { label: "30–35 Min.", level: "high",   text: "Küche gut ausgelastet" };
+  }
+
+  function updateWaitDisplay(count) {
+    const wt = calcWaitTime(count);
+    const badge = document.getElementById("wait-badge");
+    const waitLabel = document.getElementById("wait-label");
+    const waitSub   = document.getElementById("wait-sub");
+    if (!badge) return;
+    badge.className = "wait-badge level-" + wt.level;
+    waitLabel.textContent = wt.label;
+    waitSub.textContent   = wt.text;
+  }
+
+  // ── Offene Bestellungen beobachten ─────────────────────────
+  onValue(ref(db, "bestellungen"), snapshot => {
+    const data = snapshot.val() || {};
+    const openCount = Object.values(data).filter(o =>
+      o.status !== "fertig" && o.status !== "bezahlt"
+    ).length;
+    updateWaitDisplay(openCount);
+    document.getElementById("open-count").textContent = openCount;
+  });
+
+  // ── Warenkorb ──────────────────────────────────────────────
+  const cart = [];
+
+  window.addToCart = function(id, name, price) {
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ id, name, qty: 1, price });
+    }
+    renderCart();
+    const btn = document.querySelector(`[data-item-id="${id}"]`);
+    if (btn) {
+      btn.classList.add("added");
+      setTimeout(() => btn.classList.remove("added"), 600);
+    }
+  };
+
+  window.removeFromCart = function(id) {
+    const idx = cart.findIndex(i => i.id === id);
+    if (idx === -1) return;
+    if (cart[idx].qty > 1) cart[idx].qty--;
+    else cart.splice(idx, 1);
+    renderCart();
+  };
+
+  function renderCart() {
+    const list  = document.getElementById("cart-list");
+    const total = cart.reduce((a, i) => a + i.qty * i.price, 0);
+    const count = cart.reduce((a, i) => a + i.qty, 0);
+
+    document.getElementById("cart-count").textContent = count;
+    document.getElementById("cart-count-badge").textContent = count;
+    document.getElementById("cart-total").textContent = total.toFixed(2) + " €";
+
+    if (cart.length === 0) {
+      list.innerHTML = `<div class="cart-empty"><span>🛒</span><p>Noch nichts im Warenkorb</p></div>`;
+      document.getElementById("checkout-btn").disabled = true;
+      return;
+    }
+    document.getElementById("checkout-btn").disabled = false;
+
+    list.innerHTML = cart.map(item => `
+      <div class="cart-row">
+        <button class="cart-qty-btn" onclick="removeFromCart('${item.id}')">−</button>
+        <span class="cart-qty">${item.qty}×</span>
+        <span class="cart-name">${item.name}</span>
+        <button class="cart-qty-btn cart-add-btn" onclick="addToCart('${item.id}','${item.name.replace(/'/g,"\\'")}',${item.price})">+</button>
+        <span class="cart-price">${(item.qty * item.price).toFixed(2)} €</span>
+      </div>`).join("");
+  }
+
+  // ── Bestellung absenden ────────────────────────────────────
+  window.submitOrder = async function() {
+    const name  = document.getElementById("inp-name").value.trim();
+    const tel   = document.getElementById("inp-tel").value.trim();
+    const notiz = document.getElementById("inp-notiz").value.trim();
+
+    if (!name || !tel) {
+      showError("Bitte Name und Telefonnummer angeben.");
+      return;
+    }
+    if (cart.length === 0) {
+      showError("Bitte zuerst Gerichte auswählen.");
+      return;
+    }
+
+    const btn = document.getElementById("checkout-btn");
+    btn.disabled = true;
+    btn.textContent = "Wird gesendet …";
+
+    const bestellung = {
+      tisch:      "📞 Tel. o. Name",
+      status:     "neu",
+      timestamp:  Date.now(),
+      kundenname: name,
+      telefon:    tel,
+      notiz:      notiz || "",
+      items:      cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+    };
+
+    try {
+      const newRef = push(ref(db, "bestellungen"));
+      await set(newRef, bestellung);
+      showSuccess(name);
+      cart.length = 0;
+      renderCart();
+      document.getElementById("inp-name").value  = "";
+      document.getElementById("inp-tel").value   = "";
+      document.getElementById("inp-notiz").value = "";
+    } catch(e) {
+      showError("Fehler beim Senden. Bitte ruf uns an: 0291 9086372");
+      btn.disabled = false;
+      btn.textContent = "Jetzt bestellen 🛒";
+    }
+  };
+
+  function showError(msg) {
+    const el = document.getElementById("form-error");
+    el.textContent = msg;
+    el.style.display = "block";
+    setTimeout(() => { el.style.display = "none"; }, 4000);
+  }
+
+  function showSuccess(name) {
+    document.getElementById("checkout-btn").style.display = "none";
+    const s = document.getElementById("success-msg");
+    s.querySelector(".success-name").textContent = name;
+    s.style.display = "flex";
+  }
+
+  // ── Menü-Tabs ──────────────────────────────────────────────
+  window.switchTab = function(tabId) {
+    document.querySelectorAll(".menu-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".menu-panel").forEach(p => p.classList.remove("active"));
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
+    document.getElementById("panel-" + tabId).classList.add("active");
+  };
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red: #8B1A2A; --red-dark: #5C0E1A; --red-mid: #A82035;
+  --cream: #F9F3E8; --parchment: #F4EAD5;
+  --ink: #1E0A0D; --gold: #C49A2A; --gold-light: #DFB84A; --gold-pale: #F5E5B0;
+  --mid: #7A6060; --border-red: rgba(139,26,42,0.2); --border-gold: rgba(196,154,42,0.3);
+  --green: #2E7D52; --r: 10px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  min-height: 100dvh;
+}
+
+.stripe { height: 6px; background: repeating-linear-gradient(90deg, var(--red) 0, var(--red) 15px, var(--gold) 15px, var(--gold) 17px, var(--red) 17px, var(--red) 30px); }
+
+nav {
+  background: rgba(30,10,13,0.97); backdrop-filter: blur(20px);
+  border-bottom: 2px solid var(--red);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 3rem;
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+.nav-logo img { width: 44px; height: 44px; object-fit: contain; }
+.nav-logo-text span:first-child { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); display: block; }
+.nav-logo-text span:last-child  { font-size: 0.6rem; color: rgba(255,255,255,0.35); letter-spacing: 0.25em; text-transform: uppercase; }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.nav-back { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+.nav-back:hover { color: var(--gold); }
+#cart-count-badge {
+  background: var(--red); color: white;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+}
+
+.page-hero {
+  background: var(--ink);
+  padding: 3.5rem 3rem 2.5rem;
+  position: relative; overflow: hidden;
+}
+.hero-lattice {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(196,154,42,1) 59px, rgba(196,154,42,1) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(196,154,42,1) 59px, rgba(196,154,42,1) 60px);
+}
+.hero-inner {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 2rem; flex-wrap: wrap; max-width: 1200px;
+}
+.hero-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.hero-eyebrow .chin-char { font-family: 'Noto Serif SC', serif; font-size: 1.4rem; color: var(--gold); }
+.hero-eyebrow .sep { width: 1px; height: 24px; background: rgba(196,154,42,0.4); }
+.hero-eyebrow span:last-child { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); color: #fff; font-weight: 400; line-height: 1.1; }
+.hero h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 0.7rem; font-weight: 300; }
+
+.wait-badge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 1.2rem 2rem; border-radius: var(--r);
+  border: 1px solid; min-width: 190px; text-align: center;
+  transition: all 0.5s ease;
+}
+.wait-badge.level-low    { background: rgba(46,125,82,0.15);  border-color: rgba(46,125,82,0.5);  }
+.wait-badge.level-medium { background: rgba(196,154,42,0.12); border-color: rgba(196,154,42,0.5); }
+.wait-badge.level-high   { background: rgba(139,26,42,0.15);  border-color: rgba(139,26,42,0.5);  }
+.wait-heading { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.4rem; }
+#wait-label { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 600; line-height: 1; }
+.level-low    #wait-label { color: #5ECE8A; }
+.level-medium #wait-label { color: var(--gold-light); }
+.level-high   #wait-label { color: #E07080; }
+#wait-sub { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 0.4rem; }
+.wait-note { font-size: 0.65rem; color: rgba(255,255,255,0.18); margin-top: 0.6rem; }
+
+.main-wrap {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.menu-col { border-right: 1px solid var(--border-red); padding-bottom: 60px; }
+
+.menu-tabs-bar {
+  background: var(--ink); border-bottom: 1px solid rgba(139,26,42,0.3);
+  position: sticky; top: 68px; z-index: 50;
+  overflow-x: auto; scrollbar-width: none;
+  display: flex;
+}
+.menu-tabs-bar::-webkit-scrollbar { display: none; }
+.menu-tab {
+  background: transparent; border: none;
+  border-bottom: 3px solid transparent;
+  color: rgba(255,255,255,0.35); padding: 0.9rem 1.2rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.menu-tab .chin { font-family: 'Noto Serif SC', serif; font-size: 0.85rem; color: rgba(196,154,42,0.3); transition: color 0.2s; }
+.menu-tab:hover { color: rgba(255,255,255,0.65); }
+.menu-tab.active { color: var(--gold); border-bottom-color: var(--red); }
+.menu-tab.active .chin { color: var(--gold); }
+
+.menu-panel { display: none; padding: 20px 20px 0; }
+.menu-panel.active { display: block; }
+
+.panel-title {
+  font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--ink);
+  font-weight: 400; padding-bottom: 10px; margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-red);
+  display: flex; align-items: center; gap: 12px;
+}
+.panel-title-chin { font-family: 'Noto Serif SC', serif; font-size: 2rem; color: var(--red); opacity: 0.2; }
+
+.sub-title {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 0.88rem; color: var(--red);
+  margin: 14px 0 8px; display: flex; align-items: center; gap: 8px;
+}
+.sub-title::before, .sub-title::after { content: '—'; opacity: 0.4; }
+
+.items-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.menu-item {
+  background: var(--cream); border: 1px solid var(--border-red);
+  border-radius: 6px; padding: 10px 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  transition: background 0.15s;
+}
+.menu-item:hover { background: var(--parchment); }
+.item-info { flex: 1; min-width: 0; }
+.item-num  { font-size: 0.6rem; color: rgba(139,26,42,0.4); letter-spacing: 0.1em; margin-bottom: 1px; }
+.item-name-de { font-family: 'Playfair Display', serif; font-size: 0.92rem; color: var(--ink); }
+.item-desc { font-size: 0.73rem; color: var(--mid); margin-top: 2px; font-weight: 300; line-height: 1.3; }
+.item-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+.tag { font-size: 0.57rem; padding: 1px 5px; border-radius: 2px; letter-spacing: 0.06em; }
+.tag-scharf { background: rgba(139,26,42,0.1); color: var(--red); }
+.tag-veg    { background: rgba(46,125,82,0.1);  color: #2E7D52; }
+.tag-nuts   { background: rgba(196,154,42,0.15); color: #8A6A00; }
+.item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.item-price { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--red); white-space: nowrap; }
+.add-btn {
+  background: var(--red); color: white; border: none;
+  width: 30px; height: 30px; border-radius: 6px;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+.add-btn:hover  { background: var(--red-mid); }
+.add-btn:active { transform: scale(0.92); }
+.add-btn.added  { background: var(--green); }
+
+/* ── Rechte Spalte ── */
+.order-col {
+  background: var(--parchment);
+  position: sticky; top: 68px; align-self: start;
+  max-height: calc(100dvh - 68px); overflow-y: auto;
+  scrollbar-width: thin;
+}
+.order-col-header {
+  background: var(--ink);
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(139,26,42,0.3);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 5;
+}
+.order-col-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gold); }
+#cart-count { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+.cart-section { padding: 14px 18px; border-bottom: 1px solid var(--border-red); }
+.cart-section-title { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+.cart-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 0; }
+.cart-empty span { font-size: 1.8rem; opacity: 0.25; }
+.cart-empty p   { font-size: 0.78rem; color: var(--mid); }
+.cart-row {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 0; border-bottom: 1px solid rgba(139,26,42,0.1);
+  font-size: 0.8rem;
+}
+.cart-row:last-child { border-bottom: none; }
+.cart-qty-btn {
+  background: var(--border-red); border: none;
+  width: 20px; height: 20px; border-radius: 4px;
+  cursor: pointer; font-size: 13px; color: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cart-add-btn { background: rgba(46,125,82,0.15); color: var(--green); }
+.cart-qty  { font-weight: 600; color: var(--red); min-width: 22px; flex-shrink: 0; font-size: 0.78rem; }
+.cart-name { flex: 1; color: var(--ink); font-size: 0.75rem; line-height: 1.2; }
+.cart-price { font-family: 'Playfair Display', serif; font-size: 0.82rem; color: var(--ink); flex-shrink: 0; }
+
+.cart-total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0 0;
+}
+.cart-total-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mid); }
+#cart-total { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--red); font-weight: 600; }
+
+.form-section { padding: 14px 18px; border-bottom: 1px solid var(--border-red); }
+.form-group { margin-bottom: 10px; }
+.form-label { display: block; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-bottom: 4px; }
+.form-input, .form-textarea {
+  width: 100%; background: white; border: 1px solid var(--border-red);
+  border-radius: 6px; padding: 9px 11px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+  color: var(--ink); outline: none; transition: border-color 0.2s;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--red); }
+.form-textarea { resize: vertical; min-height: 65px; }
+#form-error {
+  display: none; background: rgba(139,26,42,0.1);
+  border: 1px solid rgba(139,26,42,0.3); border-radius: 6px;
+  padding: 7px 11px; font-size: 0.76rem; color: var(--red); margin-bottom: 8px;
+}
+
+.hint-box {
+  margin: 10px 18px; background: rgba(196,154,42,0.08);
+  border: 1px solid var(--border-gold); border-radius: 6px;
+  padding: 9px 13px;
+}
+.hint-box p { font-size: 0.75rem; color: var(--mid); line-height: 1.55; }
+.hint-box strong { color: var(--gold); display: block; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+
+.checkout-wrap { padding: 14px 18px 22px; }
+#checkout-btn {
+  width: 100%; background: var(--red); color: white; border: none;
+  padding: 13px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500;
+  letter-spacing: 0.05em; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+#checkout-btn:hover:not(:disabled) { background: var(--red-mid); transform: translateY(-1px); }
+#checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+#success-msg {
+  display: none; flex-direction: column; align-items: center;
+  text-align: center; gap: 10px; padding: 28px 18px;
+}
+.success-icon  { font-size: 2.8rem; }
+.success-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--green); }
+.success-sub   { font-size: 0.82rem; color: var(--mid); line-height: 1.6; }
+.success-reload {
+  background: var(--red); color: white; border: none;
+  padding: 9px 18px; border-radius: 6px; cursor: pointer;
+  font-size: 0.82rem; font-family: 'DM Sans', sans-serif; margin-top: 6px;
+}
+
+@media (max-width: 820px) {
+  nav { padding: 0.8rem 1.2rem; }
+  .page-hero { padding: 2rem 1.2rem; }
+  .hero-inner { flex-direction: column; }
+  .main-wrap { grid-template-columns: 1fr; }
+  .menu-col { border-right: none; }
+  .order-col { position: static; max-height: none; border-top: 2px solid var(--red); }
+}
+</style>
+</head>
+<body>
+
+<div class="stripe"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="./china-garden-logo-transparent.png" alt="China Garden">
+    <div class="nav-logo-text">
+      <span>China Garden</span>
+      <span>Meschede</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a class="nav-back" href="index.html">← Startseite</a>
+    <div id="cart-count-badge">0</div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="hero-lattice"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">
+        <span class="chin-char">外卖</span>
+        <div class="sep"></div>
+        <span>Online Take-Away</span>
+      </div>
+      <h1 class="hero">Bestellen &amp;<br><em>abholen</em></h1>
+      <p class="hero-sub">Wähle deine Gerichte – wir bereiten alles frisch zu.</p>
+    </div>
+
+    <div id="wait-badge" class="wait-badge level-low">
+      <div class="wait-heading">⏱ Geschätzte Wartezeit</div>
+      <div id="wait-label">15–20 Min.</div>
+      <div id="wait-sub">Wenig los – schnelle Zubereitung</div>
+      <div class="wait-note">Offene Bestellungen: <span id="open-count">–</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="main-wrap">
+
+  <!-- ── Speisekarte ── -->
+  <div class="menu-col">
+    <div class="menu-tabs-bar">
+      <button class="menu-tab active" data-tab="vorspeisen" onclick="switchTab('vorspeisen')"><span class="chin">前菜</span> Vorspeisen</button>
+      <button class="menu-tab" data-tab="mittag" onclick="switchTab('mittag')"><span class="chin">午</span> Mittagsmenü</button>
+      <button class="menu-tab" data-tab="huehnchen" onclick="switchTab('huehnchen')"><span class="chin">鸡</span> Huhn</button>
+      <button class="menu-tab" data-tab="ente" onclick="switchTab('ente')"><span class="chin">鸭</span> Ente</button>
+      <button class="menu-tab" data-tab="rind" onclick="switchTab('rind')"><span class="chin">牛</span> Rind</button>
+      <button class="menu-tab" data-tab="schwein" onclick="switchTab('schwein')"><span class="chin">猪</span> Schwein</button>
+      <button class="menu-tab" data-tab="meeresfrüchte" onclick="switchTab('meeresfrüchte')"><span class="chin">海鲜</span> Meer</button>
+      <button class="menu-tab" data-tab="vegetarisch" onclick="switchTab('vegetarisch')"><span class="chin">素</span> Veg.</button>
+      <button class="menu-tab" data-tab="reis" onclick="switchTab('reis')"><span class="chin">饭</span> Reis &amp; Nudeln</button>
+      <button class="menu-tab" data-tab="curry" onclick="switchTab('curry')"><span class="chin">咖喱</span> Curry</button>
+      <button class="menu-tab" data-tab="sushi" onclick="switchTab('sushi')"><span class="chin">寿司</span> Sushi</button>
+      <button class="menu-tab" data-tab="kinder" onclick="switchTab('kinder')"><span class="chin">童</span> Kinder</button>
+      <button class="menu-tab" data-tab="dessert" onclick="switchTab('dessert')"><span class="chin">甜</span> Dessert</button>
+    </div>
+
+    <!-- VORSPEISEN -->
+    <div class="menu-panel active" id="panel-vorspeisen">
+      <div class="panel-title"><span class="panel-title-chin">前</span> Vorspeisen</div>
+      <div class="sub-title">Suppen</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 1</div><div class="item-name-de">Peking-Gulasch Suppe</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-right"><div class="item-price">3,00 €</div><button class="add-btn" data-item-id="1" onclick="addToCart('1','Peking-Gulasch Suppe',3.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 2</div><div class="item-name-de">Eierblumen-Suppe</div><div class="item-desc">mit Hühnerfleisch</div></div><div class="item-right"><div class="item-price">3,00 €</div><button class="add-btn" data-item-id="2" onclick="addToCart('2','Eierblumen-Suppe',3.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 3</div><div class="item-name-de">Wan-Tan Suppe</div><div class="item-desc">Teigtaschen mit Schweinefleisch</div></div><div class="item-right"><div class="item-price">3,50 €</div><button class="add-btn" data-item-id="3" onclick="addToCart('3','Wan-Tan Suppe',3.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 4</div><div class="item-name-de">Gemüse-Suppe</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">3,00 €</div><button class="add-btn" data-item-id="4" onclick="addToCart('4','Gemüse-Suppe',3.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 5</div><div class="item-name-de">Sam-Sin Suppe</div><div class="item-desc">Hühner, Krabben, Shrimps</div></div><div class="item-right"><div class="item-price">3,80 €</div><button class="add-btn" data-item-id="5" onclick="addToCart('5','Sam-Sin Suppe',3.80)">+</button></div></div>
+      </div>
+      <div class="sub-title">Beilagen &amp; Salate</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 8</div><div class="item-name-de">Frühlingsrollen</div></div><div class="item-right"><div class="item-price">3,20 €</div><button class="add-btn" data-item-id="8" onclick="addToCart('8','Frühlingsrollen',3.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 8a</div><div class="item-name-de">Frühlingsrollen Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">3,20 €</div><button class="add-btn" data-item-id="8a" onclick="addToCart('8a','Frühlingsrollen Gemüse',3.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 9</div><div class="item-name-de">Tsing Dao Mini Frühlingsrollen</div><div class="item-desc">8 Stück</div></div><div class="item-right"><div class="item-price">3,20 €</div><button class="add-btn" data-item-id="9" onclick="addToCart('9','Tsing Dao Mini Frühlingsrollen',3.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 10</div><div class="item-name-de">Krupuk</div><div class="item-desc">Krabbenchips</div></div><div class="item-right"><div class="item-price">2,50 €</div><button class="add-btn" data-item-id="10" onclick="addToCart('10','Krupuk',2.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 12</div><div class="item-name-de">Gemischter Salat</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">3,80 €</div><button class="add-btn" data-item-id="12" onclick="addToCart('12','Gemischter Salat',3.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 13</div><div class="item-name-de">Gebackene Garnelen</div><div class="item-desc">3 Stück mit Süß-Sauer-Soße</div></div><div class="item-right"><div class="item-price">4,50 €</div><button class="add-btn" data-item-id="13" onclick="addToCart('13','Gebackene Garnelen',4.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 14</div><div class="item-name-de">Hühnerfleisch-Salat</div></div><div class="item-right"><div class="item-price">5,20 €</div><button class="add-btn" data-item-id="14" onclick="addToCart('14','Hühnerfleisch-Salat',5.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 15</div><div class="item-name-de">Hühnerfleisch Sate</div><div class="item-desc">2 Spieße</div></div><div class="item-right"><div class="item-price">3,50 €</div><button class="add-btn" data-item-id="15" onclick="addToCart('15','Hühnerfleisch Sate',3.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 16</div><div class="item-name-de">Mix-Platte für 2 Personen</div><div class="item-desc">Sate, Mini-Frühlingsrollen, Garnelen, Krupuk</div></div><div class="item-right"><div class="item-price">6,80 €</div><button class="add-btn" data-item-id="16" onclick="addToCart('16','Mix-Platte für 2 Personen',6.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 17</div><div class="item-name-de">Krabben-Salat</div></div><div class="item-right"><div class="item-price">6,80 €</div><button class="add-btn" data-item-id="17" onclick="addToCart('17','Krabben-Salat',6.80)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- MITTAGSMENÜ -->
+    <div class="menu-panel" id="panel-mittag">
+      <div class="panel-title"><span class="panel-title-chin">午</span> Mittagsmenü</div>
+      <p style="font-size:0.73rem;color:var(--mid);margin-bottom:12px;font-weight:300;">Mo–Sa · 11:30–15:00 Uhr (außer Feiertage)</p>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">T1</div><div class="item-name-de">Gebratene Eiernudeln</div><div class="item-desc">mit Hühnerfleisch und Gemüse</div></div><div class="item-right"><div class="item-price">6,90 €</div><button class="add-btn" data-item-id="T1" onclick="addToCart('T1','Gebratene Eiernudeln',6.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T2</div><div class="item-name-de">Gebratener Eierreis</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">6,90 €</div><button class="add-btn" data-item-id="T2" onclick="addToCart('T2','Gebratener Eierreis',6.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T3</div><div class="item-name-de">Hühnerfleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T3" onclick="addToCart('T3','Hühnerfleisch Chop-Suey (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T4</div><div class="item-name-de">Hühnerfleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T4" onclick="addToCart('T4','Hühnerfleisch Sichuan-Art (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T5</div><div class="item-name-de">Hühnerfleisch Curry</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T5" onclick="addToCart('T5','Hühnerfleisch Curry (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T6</div><div class="item-name-de">Schweinefleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T6" onclick="addToCart('T6','Schweinefleisch Chop-Suey (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T7</div><div class="item-name-de">Schweinefleisch mit Ananas</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T7" onclick="addToCart('T7','Schweinefleisch mit Ananas (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T8</div><div class="item-name-de">Schweinefleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T8" onclick="addToCart('T8','Schweinefleisch Sichuan-Art (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T9</div><div class="item-name-de">Rindfleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">8,50 €</div><button class="add-btn" data-item-id="T9" onclick="addToCart('T9','Rindfleisch Chop-Suey (T)',8.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T10</div><div class="item-name-de">Rindfleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Scharf</span></div></div><div class="item-right"><div class="item-price">8,50 €</div><button class="add-btn" data-item-id="T10" onclick="addToCart('T10','Rindfleisch Sichuan-Art (T)',8.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T11</div><div class="item-name-de">Rindfleisch mit Zwiebeln</div></div><div class="item-right"><div class="item-price">8,50 €</div><button class="add-btn" data-item-id="T11" onclick="addToCart('T11','Rindfleisch mit Zwiebeln (T)',8.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T12</div><div class="item-name-de">Knusprige Ente</div></div><div class="item-right"><div class="item-price">10,90 €</div><button class="add-btn" data-item-id="T12" onclick="addToCart('T12','Knusprige Ente (T)',10.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T13</div><div class="item-name-de">Knuspriges Hühnerfleisch</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T13" onclick="addToCart('T13','Knuspriges Hühnerfleisch (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T14</div><div class="item-name-de">Panierte Hühnerfleischstreifen</div></div><div class="item-right"><div class="item-price">8,00 €</div><button class="add-btn" data-item-id="T14" onclick="addToCart('T14','Panierte Hühnerfleischstreifen (T)',8.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T15</div><div class="item-name-de">Gebackenes Fischfilet</div></div><div class="item-right"><div class="item-price">7,50 €</div><button class="add-btn" data-item-id="T15" onclick="addToCart('T15','Gebackenes Fischfilet (T)',7.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T16</div><div class="item-name-de">Schätze der Natur</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">7,50 €</div><button class="add-btn" data-item-id="T16" onclick="addToCart('T16','Schätze der Natur (T)',7.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">T17</div><div class="item-name-de">Tofu mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">7,80 €</div><button class="add-btn" data-item-id="T17" onclick="addToCart('T17','Tofu mit Gemüse (T)',7.80)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- HÜHNCHEN -->
+    <div class="menu-panel" id="panel-huehnchen">
+      <div class="panel-title"><span class="panel-title-chin">鸡</span> Hühnerfleisch</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 19</div><div class="item-name-de">Hühnerfleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="19" onclick="addToCart('19','Hühnerfleisch Chop-Suey',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 20</div><div class="item-name-de">Hühnerfleisch Sa-Za</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="20" onclick="addToCart('20','Hühnerfleisch Sa-Za',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 21</div><div class="item-name-de">Hühnerfleisch Gong Bao</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="21" onclick="addToCart('21','Hühnerfleisch Gong Bao',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 22</div><div class="item-name-de">Hühnerfleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="22" onclick="addToCart('22','Hühnerfleisch Sichuan-Art',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 23</div><div class="item-name-de">Hühnerfleisch mit Brokkoli</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="23" onclick="addToCart('23','Hühnerfleisch mit Brokkoli',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 25</div><div class="item-name-de">Paniertes Hühnerfleisch</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="25" onclick="addToCart('25','Paniertes Hühnerfleisch',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 26</div><div class="item-name-de">Hühnerfleisch-Sate</div><div class="item-desc">8 Spieße mit Erdnuss-Soße</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="26" onclick="addToCart('26','Hühnerfleisch-Sate',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 27</div><div class="item-name-de">Gebackenes Hühnerfleisch</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="27" onclick="addToCart('27','Gebackenes Hühnerfleisch',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 28</div><div class="item-name-de">Eingelegtes gebackenes Hühnerfleisch</div><div class="item-desc">Ananas Süß-Sauer-Soße</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="28" onclick="addToCart('28','Eingelegtes gebackenes Hühnerfleisch',12.20)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- ENTE -->
+    <div class="menu-panel" id="panel-ente">
+      <div class="panel-title"><span class="panel-title-chin">鸭</span> Enten-Gerichte</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 32</div><div class="item-name-de">Knusprige Ente Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">13,90 €</div><button class="add-btn" data-item-id="32" onclick="addToCart('32','Knusprige Ente Sichuan-Art',13.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 33</div><div class="item-name-de">Knusprige Ente mit Ananas</div></div><div class="item-right"><div class="item-price">13,90 €</div><button class="add-btn" data-item-id="33" onclick="addToCart('33','Knusprige Ente mit Ananas',13.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 35</div><div class="item-name-de">Knusprige Ente kantonesische Art</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-right"><div class="item-price">13,90 €</div><button class="add-btn" data-item-id="35" onclick="addToCart('35','Knusprige Ente kantonesische Art',13.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 37</div><div class="item-name-de">Ba-Bao-Ya knusprige Ente</div><div class="item-desc">8 Köstlichkeiten</div></div><div class="item-right"><div class="item-price">14,90 €</div><button class="add-btn" data-item-id="37" onclick="addToCart('37','Ba-Bao-Ya knusprige Ente',14.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 38</div><div class="item-name-de">Knusprige Ente Shanghai-Art</div><div class="item-desc">mit Erdnuss-Soße</div></div><div class="item-right"><div class="item-price">13,90 €</div><button class="add-btn" data-item-id="38" onclick="addToCart('38','Knusprige Ente Shanghai-Art',13.90)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- RIND -->
+    <div class="menu-panel" id="panel-rind">
+      <div class="panel-title"><span class="panel-title-chin">牛</span> Rindfleisch</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 50</div><div class="item-name-de">Rindfleisch Sa-Za</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="50" onclick="addToCart('50','Rindfleisch Sa-Za',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 51</div><div class="item-name-de">Rindfleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="51" onclick="addToCart('51','Rindfleisch Chop-Suey',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 52</div><div class="item-name-de">Rindfleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="52" onclick="addToCart('52','Rindfleisch Sichuan-Art',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 53</div><div class="item-name-de">Rindfleisch mit Zwiebeln</div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="53" onclick="addToCart('53','Rindfleisch mit Zwiebeln',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 54</div><div class="item-name-de">Rindfleisch mit Brokkoli</div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="54" onclick="addToCart('54','Rindfleisch mit Brokkoli',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 56</div><div class="item-name-de">Rindfleisch schwarze Bohnen</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="56" onclick="addToCart('56','Rindfleisch schwarze Bohnen',12.50)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- SCHWEIN -->
+    <div class="menu-panel" id="panel-schwein">
+      <div class="panel-title"><span class="panel-title-chin">猪</span> Schweinefleisch</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 41</div><div class="item-name-de">Schweinefleisch Chop-Suey</div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="41" onclick="addToCart('41','Schweinefleisch Chop-Suey',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 42</div><div class="item-name-de">Schweinefleisch Sichuan-Art</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="42" onclick="addToCart('42','Schweinefleisch Sichuan-Art',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 43</div><div class="item-name-de">Schweinefleisch Sa-Za</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="43" onclick="addToCart('43','Schweinefleisch Sa-Za',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 46</div><div class="item-name-de">Gebackenes Schweinefleisch</div><div class="item-desc">Ananas Süß-Sauer-Soße</div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="46" onclick="addToCart('46','Gebackenes Schweinefleisch',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 47</div><div class="item-name-de">Acht Köstlichkeiten</div><div class="item-desc">Rind, Huhn, Schwein, Garnelen</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">13,50 €</div><button class="add-btn" data-item-id="47" onclick="addToCart('47','Acht Köstlichkeiten',13.50)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- MEERESFRÜCHTE -->
+    <div class="menu-panel" id="panel-meeresfrüchte">
+      <div class="panel-title"><span class="panel-title-chin">海鲜</span> Meeresfrüchte</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 63</div><div class="item-name-de">Gebackenes Fischfilet</div></div><div class="item-right"><div class="item-price">10,90 €</div><button class="add-btn" data-item-id="63" onclick="addToCart('63','Gebackenes Fischfilet',10.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 66</div><div class="item-name-de">Tintenfisch schwarze Bohnen</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">14,80 €</div><button class="add-btn" data-item-id="66" onclick="addToCart('66','Tintenfisch schwarze Bohnen',14.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 71</div><div class="item-name-de">Gebratene Garnelen mit Schale</div><div class="item-desc">10 Stück</div></div><div class="item-right"><div class="item-price">16,90 €</div><button class="add-btn" data-item-id="71" onclick="addToCart('71','Gebratene Garnelen mit Schale',16.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 72</div><div class="item-name-de">Garnelen Gong Bao Art</div><div class="item-tags"><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">16,90 €</div><button class="add-btn" data-item-id="72" onclick="addToCart('72','Garnelen Gong Bao Art',16.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 73</div><div class="item-name-de">Knusprige Gebackene Garnelen</div><div class="item-desc">8 Stück</div></div><div class="item-right"><div class="item-price">12,00 €</div><button class="add-btn" data-item-id="73" onclick="addToCart('73','Knusprige Gebackene Garnelen',12.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 77</div><div class="item-name-de">Gebratene Garnelen mit Gemüse</div></div><div class="item-right"><div class="item-price">16,90 €</div><button class="add-btn" data-item-id="77" onclick="addToCart('77','Gebratene Garnelen mit Gemüse',16.90)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- VEGETARISCH -->
+    <div class="menu-panel" id="panel-vegetarisch">
+      <div class="panel-title"><span class="panel-title-chin">素</span> Vegetarisch</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 79</div><div class="item-name-de">Gebratener Eierreis mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">9,00 €</div><button class="add-btn" data-item-id="79" onclick="addToCart('79','Gebratener Eierreis mit Gemüse',9.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 80</div><div class="item-name-de">Gebratene Nudeln mit Gemüse</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">9,00 €</div><button class="add-btn" data-item-id="80" onclick="addToCart('80','Gebratene Nudeln mit Gemüse',9.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 81</div><div class="item-name-de">Chop-Suey Tofu</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">10,80 €</div><button class="add-btn" data-item-id="81" onclick="addToCart('81','Chop-Suey Tofu',10.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 82</div><div class="item-name-de">Tofu Sichuan-Art</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span><span class="tag tag-scharf">Leicht Scharf</span></div></div><div class="item-right"><div class="item-price">10,80 €</div><button class="add-btn" data-item-id="82" onclick="addToCart('82','Tofu Sichuan-Art',10.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 83</div><div class="item-name-de">Schätze der Natur</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">10,50 €</div><button class="add-btn" data-item-id="83" onclick="addToCart('83','Schätze der Natur',10.50)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- REIS & NUDELN -->
+    <div class="menu-panel" id="panel-reis">
+      <div class="panel-title"><span class="panel-title-chin">饭</span> Reis &amp; Nudeln</div>
+      <div class="sub-title">Reis</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 85</div><div class="item-name-de">Eierreis mit Hühnerfleisch</div></div><div class="item-right"><div class="item-price">10,50 €</div><button class="add-btn" data-item-id="85" onclick="addToCart('85','Eierreis mit Hühnerfleisch',10.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 86</div><div class="item-name-de">Eierreis mit Rindfleisch</div></div><div class="item-right"><div class="item-price">10,80 €</div><button class="add-btn" data-item-id="86" onclick="addToCart('86','Eierreis mit Rindfleisch',10.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 87</div><div class="item-name-de">Eierreis mit Schweinefleisch</div></div><div class="item-right"><div class="item-price">10,50 €</div><button class="add-btn" data-item-id="87" onclick="addToCart('87','Eierreis mit Schweinefleisch',10.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 88</div><div class="item-name-de">Eierreis gemischt</div><div class="item-desc">Shrimps, Huhn, Rind, Gemüse</div></div><div class="item-right"><div class="item-price">13,50 €</div><button class="add-btn" data-item-id="88" onclick="addToCart('88','Eierreis gemischt',13.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 89</div><div class="item-name-de">Eierreis mit Ente</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-right"><div class="item-price">12,90 €</div><button class="add-btn" data-item-id="89" onclick="addToCart('89','Eierreis mit Ente',12.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 90</div><div class="item-name-de">Eierreis mit gebackenem Huhn</div></div><div class="item-right"><div class="item-price">11,90 €</div><button class="add-btn" data-item-id="90" onclick="addToCart('90','Eierreis mit gebackenem Huhn',11.90)">+</button></div></div>
+      </div>
+      <div class="sub-title">Nudeln</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 91</div><div class="item-name-de">Eiernudeln mit Hühnerfleisch</div></div><div class="item-right"><div class="item-price">10,50 €</div><button class="add-btn" data-item-id="91" onclick="addToCart('91','Eiernudeln mit Hühnerfleisch',10.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 92</div><div class="item-name-de">Eiernudeln mit Rindfleisch</div></div><div class="item-right"><div class="item-price">10,80 €</div><button class="add-btn" data-item-id="92" onclick="addToCart('92','Eiernudeln mit Rindfleisch',10.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 93</div><div class="item-name-de">Eiernudeln mit Schweinefleisch</div></div><div class="item-right"><div class="item-price">10,50 €</div><button class="add-btn" data-item-id="93" onclick="addToCart('93','Eiernudeln mit Schweinefleisch',10.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 95</div><div class="item-name-de">Eiernudeln gemischt</div></div><div class="item-right"><div class="item-price">10,80 €</div><button class="add-btn" data-item-id="95" onclick="addToCart('95','Eiernudeln gemischt',10.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 96</div><div class="item-name-de">Eiernudeln mit Garnelen</div></div><div class="item-right"><div class="item-price">13,80 €</div><button class="add-btn" data-item-id="96" onclick="addToCart('96','Eiernudeln mit Garnelen',13.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 97</div><div class="item-name-de">Gebratene Reisnudeln</div></div><div class="item-right"><div class="item-price">13,50 €</div><button class="add-btn" data-item-id="97" onclick="addToCart('97','Gebratene Reisnudeln',13.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 98</div><div class="item-name-de">Eiernudeln mit gebackenem Huhn</div></div><div class="item-right"><div class="item-price">11,90 €</div><button class="add-btn" data-item-id="98" onclick="addToCart('98','Eiernudeln mit gebackenem Huhn',11.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 99</div><div class="item-name-de">Eiernudeln mit Ente</div><div class="item-tags"><span class="tag tag-scharf">Pikant</span></div></div><div class="item-right"><div class="item-price">12,90 €</div><button class="add-btn" data-item-id="99" onclick="addToCart('99','Eiernudeln mit Ente',12.90)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- CURRY -->
+    <div class="menu-panel" id="panel-curry">
+      <div class="panel-title"><span class="panel-title-chin">咖喱</span> Curry</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 57</div><div class="item-name-de">Rindfleisch Curry</div></div><div class="item-right"><div class="item-price">12,50 €</div><button class="add-btn" data-item-id="57" onclick="addToCart('57','Rindfleisch Curry',12.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 58</div><div class="item-name-de">Schweinefleisch Curry</div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="58" onclick="addToCart('58','Schweinefleisch Curry',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 59</div><div class="item-name-de">Hühnerfleisch Curry</div></div><div class="item-right"><div class="item-price">12,20 €</div><button class="add-btn" data-item-id="59" onclick="addToCart('59','Hühnerfleisch Curry',12.20)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 60</div><div class="item-name-de">Garnelen Curry</div></div><div class="item-right"><div class="item-price">16,90 €</div><button class="add-btn" data-item-id="60" onclick="addToCart('60','Garnelen Curry',16.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 61</div><div class="item-name-de">Nasi-Goreng Eierreis</div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="61" onclick="addToCart('61','Nasi-Goreng Eierreis',11.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">Nr. 62</div><div class="item-name-de">Bami-Goreng Eiernudeln</div></div><div class="item-right"><div class="item-price">11,50 €</div><button class="add-btn" data-item-id="62" onclick="addToCart('62','Bami-Goreng Eiernudeln',11.50)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- SUSHI -->
+    <div class="menu-panel" id="panel-sushi">
+      <div class="panel-title"><span class="panel-title-chin">寿司</span> Sushi</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">S1</div><div class="item-name-de">Vegetarische Sushi</div><div class="item-desc">8 Stück</div><div class="item-tags"><span class="tag tag-veg">Vegetarisch</span></div></div><div class="item-right"><div class="item-price">5,60 €</div><button class="add-btn" data-item-id="S1" onclick="addToCart('S1','Vegetarische Sushi',5.60)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">S2</div><div class="item-name-de">Meeresfrüchte Sushi</div><div class="item-desc">6 Stück</div></div><div class="item-right"><div class="item-price">7,90 €</div><button class="add-btn" data-item-id="S2" onclick="addToCart('S2','Meeresfrüchte Sushi',7.90)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">S3</div><div class="item-name-de">Große Mix Sushi-Platte</div><div class="item-desc">12 Stück</div></div><div class="item-right"><div class="item-price">12,00 €</div><button class="add-btn" data-item-id="S3" onclick="addToCart('S3','Große Mix Sushi-Platte',12.00)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- KINDER -->
+    <div class="menu-panel" id="panel-kinder">
+      <div class="panel-title"><span class="panel-title-chin">童</span> Kinder</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">K1</div><div class="item-name-de">Paniertes Hühnerfleisch</div><div class="item-desc">mit Reis oder Pommes</div></div><div class="item-right"><div class="item-price">6,50 €</div><button class="add-btn" data-item-id="K1" onclick="addToCart('K1','Paniertes Hühnerfleisch (K)',6.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">K2</div><div class="item-name-de">Hühnerfleisch mit Champignons und Reis</div></div><div class="item-right"><div class="item-price">6,50 €</div><button class="add-btn" data-item-id="K2" onclick="addToCart('K2','Hühnerfleisch mit Champignons und Reis',6.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">K3</div><div class="item-name-de">Kinder-Kombi</div><div class="item-desc">3 Mini-Frühlingsrollen, Pommes, 1 Spieß</div></div><div class="item-right"><div class="item-price">5,00 €</div><button class="add-btn" data-item-id="K3" onclick="addToCart('K3','Kinder-Kombi',5.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">K4</div><div class="item-name-de">Pommes</div></div><div class="item-right"><div class="item-price">2,80 €</div><button class="add-btn" data-item-id="K4" onclick="addToCart('K4','Pommes',2.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">K5</div><div class="item-name-de">Eiernudeln oder Eierreis mit Huhn</div></div><div class="item-right"><div class="item-price">6,50 €</div><button class="add-btn" data-item-id="K5" onclick="addToCart('K5','Eiernudeln oder Eierreis mit Huhn',6.50)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- DESSERT -->
+    <div class="menu-panel" id="panel-dessert">
+      <div class="panel-title"><span class="panel-title-chin">甜</span> Dessert</div>
+      <div class="items-list">
+        <div class="menu-item"><div class="item-info"><div class="item-num">D1</div><div class="item-name-de">Lychee-Früchte</div></div><div class="item-right"><div class="item-price">2,80 €</div><button class="add-btn" data-item-id="D1" onclick="addToCart('D1','Lychee-Früchte',2.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">D2</div><div class="item-name-de">Götterspeise</div><div class="item-desc">mit Vanille-Soße</div></div><div class="item-right"><div class="item-price">3,80 €</div><button class="add-btn" data-item-id="D2" onclick="addToCart('D2','Götterspeise',3.80)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">D3</div><div class="item-name-de">Gebackene Banane mit Honig</div></div><div class="item-right"><div class="item-price">3,00 €</div><button class="add-btn" data-item-id="D3" onclick="addToCart('D3','Gebackene Banane mit Honig',3.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">D5</div><div class="item-name-de">Gebackene Ananas mit Honig</div></div><div class="item-right"><div class="item-price">3,00 €</div><button class="add-btn" data-item-id="D5" onclick="addToCart('D5','Gebackene Ananas mit Honig',3.00)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">D6</div><div class="item-name-de">Obstsalat</div></div><div class="item-right"><div class="item-price">4,50 €</div><button class="add-btn" data-item-id="D6" onclick="addToCart('D6','Obstsalat',4.50)">+</button></div></div>
+        <div class="menu-item"><div class="item-info"><div class="item-num">D7</div><div class="item-name-de">Drei Kugeln Eis</div></div><div class="item-right"><div class="item-price">3,50 €</div><button class="add-btn" data-item-id="D7" onclick="addToCart('D7','Drei Kugeln Eis',3.50)">+</button></div></div>
+      </div>
+    </div>
+
+  </div><!-- /menu-col -->
+
+  <!-- ── Warenkorb & Formular ── -->
+  <div class="order-col">
+    <div class="order-col-header">
+      <span class="order-col-title">🛒 Deine Bestellung</span>
+      <span id="cart-count" style="font-size:0.78rem;color:rgba(255,255,255,0.4);">0 Artikel</span>
+    </div>
+
+    <div class="cart-section">
+      <div class="cart-section-title">Warenkorb</div>
+      <div id="cart-list">
+        <div class="cart-empty"><span>🛒</span><p>Noch nichts ausgewählt</p></div>
+      </div>
+      <div class="cart-total-row">
+        <span class="cart-total-label">Gesamt</span>
+        <span id="cart-total">0,00 €</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="cart-section-title">Deine Kontaktdaten</div>
+      <div class="form-group">
+        <label class="form-label" for="inp-name">Name *</label>
+        <input class="form-input" id="inp-name" type="text" placeholder="Dein Name" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inp-tel">Telefonnummer *</label>
+        <input class="form-input" id="inp-tel" type="tel" placeholder="z.B. 0291 123456" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inp-notiz">Anmerkungen (optional)</label>
+        <textarea class="form-textarea" id="inp-notiz" placeholder="z.B. keine Erdnüsse, extra scharf …"></textarea>
+      </div>
+      <div id="form-error"></div>
+    </div>
+
+    <div class="hint-box">
+      <p><strong>Hinweis</strong>Hauptgerichte werden mit Reis serviert. Deine Bestellung geht direkt in unsere Küche – zur angezeigten Wartezeit kannst du abholen.</p>
+    </div>
+
+    <div class="checkout-wrap">
+      <button id="checkout-btn" disabled onclick="submitOrder()">Jetzt bestellen 🛒</button>
+
+      <div id="success-msg">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Bestellung eingegangen!</div>
+        <p class="success-sub">Danke, <strong class="success-name"></strong>!<br>Deine Bestellung ist direkt in unserer Küche.<br>Bitte komm zur angezeigten Wartezeit.<br><br>📞 Bei Fragen: <strong>0291 9086372</strong></p>
+        <button class="success-reload" onclick="location.reload()">Weitere Bestellung aufgeben</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<div class="stripe"></div>
+
+</body>
+</html>
