@@ -54,6 +54,10 @@
     document.getElementById("open-count").textContent = openCount;
   });
 
+  // ── Mittagsmenü sperren beim Laden + stündlich prüfen ──────
+  applyMittagLock();
+  setInterval(applyMittagLock, 60 * 1000);
+
   // ── Warenkorb ──────────────────────────────────────────────
   const cart = [];
 
@@ -166,12 +170,99 @@
   }
 
   // ── Menü-Tabs ──────────────────────────────────────────────
+  // ── Mittagsmenü Zeitprüfung ─────────────────────────────────
+  function isMittagzeit() {
+    const now = new Date();
+    const day = now.getDay(); // 0=So, 1=Mo, ..., 6=Sa
+    if (day === 3) return false; // Mittwoch = Ruhetag
+    const h = now.getHours(), m = now.getMinutes();
+    const mins = h * 60 + m;
+    return mins >= 11 * 60 + 30 && mins < 15 * 60;
+  }
+
+  function showMittagHint() {
+    let hint = document.getElementById('mittag-toast');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'mittag-toast';
+      hint.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(30,10,13,0.95);color:#fff;padding:0.8rem 1.6rem;border-radius:6px;border:1px solid rgba(196,154,42,0.4);font-size:0.82rem;z-index:9999;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+      hint.innerHTML = '🕐 Das Mittagsmenü ist nur <strong>Mo–Sa von 11:30–15:00 Uhr</strong> verfügbar.';
+      document.body.appendChild(hint);
+    }
+    hint.style.display = 'block';
+    clearTimeout(hint._t);
+    hint._t = setTimeout(() => { hint.style.display = 'none'; }, 3000);
+  }
+
+  function applyMittagLock() {
+    const tab   = document.querySelector('.menu-tab[data-tab="mittag"]');
+    const panel = document.getElementById('panel-mittag');
+    if (!tab || !panel) return;
+    if (isMittagzeit()) {
+      tab.disabled = false;
+      tab.style.opacity = '';
+      tab.style.cursor = '';
+      tab.title = '';
+      tab.querySelector('.mittag-hint')?.remove();
+      panel.classList.remove('hidden');
+    } else {
+      tab.disabled = true;
+      tab.style.opacity = '0.4';
+      tab.style.cursor = 'not-allowed';
+      tab.title = 'Nur Mo–Sa 11:30–15:00 verfügbar';
+      if (!tab.querySelector('.mittag-hint')) {
+        const hint = document.createElement('span');
+        hint.className = 'mittag-hint';
+        hint.style.cssText = 'display:block;font-size:0.5rem;color:rgba(255,255,255,0.4);letter-spacing:0.05em;margin-top:2px;';
+        hint.textContent = '11:30–15:00';
+        tab.appendChild(hint);
+      }
+      panel.classList.add('hidden');
+    }
+  }
+
+  // ── Scroll-Nav: click scrolls to section ───────────────────
   window.switchTab = function(tabId) {
-    document.querySelectorAll(".menu-tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".menu-panel").forEach(p => p.classList.remove("active"));
-    document.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
-    document.getElementById("panel-" + tabId).classList.add("active");
+    if (tabId === 'mittag' && !isMittagzeit()) {
+      showMittagHint();
+      return;
+    }
+    const panel = document.getElementById('panel-' + tabId);
+    if (!panel) return;
+    const tabBar = document.querySelector('.menu-tabs-bar');
+    const offset = (tabBar ? tabBar.offsetHeight : 0) + 64; // nav + tabbar
+    const top = panel.getBoundingClientRect().top + window.scrollY - offset - 8;
+    window.scrollTo({ top, behavior: 'smooth' });
   };
+
+  // ── Scroll-Spy: highlight active tab while scrolling ────────
+  function setupScrollSpy() {
+    const panels = Array.from(document.querySelectorAll('.menu-panel:not(.hidden)'));
+    const tabs   = document.querySelector('.menu-tabs-bar');
+    if (!tabs) return;
+    const tabBarH = tabs.offsetHeight + 64;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace('panel-', '');
+          document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+          const activeTab = document.querySelector(`.menu-tab[data-tab="${id}"]`);
+          if (activeTab) {
+            activeTab.classList.add('active');
+            // scroll tab into view within the tab bar
+            activeTab.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+          }
+        }
+      });
+    }, { rootMargin: `-${tabBarH}px 0px -60% 0px`, threshold: 0 });
+
+    panels.forEach(p => observer.observe(p));
+  }
+
+  // Run after DOM settles
+  setTimeout(setupScrollSpy, 100);
+
 </script>
 
 <style>
@@ -217,17 +308,25 @@ nav {
 
 .page-hero {
   background: var(--ink);
-  padding: 3.5rem 3rem 2.5rem;
+  background-image: url('./Restaurantbild.webp');
+  background-size: cover;
+  background-position: center 40%;
+  padding: 6rem 3rem 4rem;
   position: relative; overflow: hidden;
+  min-height: 280px;
+}
+.hero-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(135deg, rgba(30,10,13,0.88) 0%, rgba(30,10,13,0.65) 60%, rgba(30,10,13,0.5) 100%);
 }
 .hero-lattice {
-  position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.05; z-index: 1;
   background-image:
     repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(196,154,42,1) 59px, rgba(196,154,42,1) 60px),
     repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(196,154,42,1) 59px, rgba(196,154,42,1) 60px);
 }
 .hero-inner {
-  position: relative; z-index: 2;
+  position: relative; z-index: 3;
   display: flex; justify-content: space-between; align-items: center;
   gap: 2rem; flex-wrap: wrap; max-width: 1200px;
 }
@@ -285,9 +384,11 @@ nav {
 .menu-tab:hover { color: rgba(255,255,255,0.65); }
 .menu-tab.active { color: var(--gold); border-bottom-color: var(--red); }
 .menu-tab.active .chin { color: var(--gold); }
+.menu-tab:disabled { cursor: not-allowed; }
 
-.menu-panel { display: none; padding: 20px 20px 0; }
-.menu-panel.active { display: block; }
+.menu-panel { display: block; padding: 20px 20px 0; }
+.menu-panel + .menu-panel { border-top: 1px solid var(--border-red); margin-top: 8px; padding-top: 28px; }
+.menu-panel.hidden { display: none; }
 
 .panel-title {
   font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--ink);
@@ -460,6 +561,7 @@ nav {
 </nav>
 
 <section class="page-hero">
+  <div class="hero-overlay"></div>
   <div class="hero-lattice"></div>
   <div class="hero-inner">
     <div>
@@ -502,7 +604,7 @@ nav {
     </div>
 
     <!-- VORSPEISEN -->
-    <div class="menu-panel active" id="panel-vorspeisen">
+    <div class="menu-panel" id="panel-vorspeisen">
       <div class="panel-title"><span class="panel-title-chin">前</span> Vorspeisen</div>
       <div class="sub-title">Suppen</div>
       <div class="items-list">
