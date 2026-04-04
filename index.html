@@ -6,7 +6,6 @@
 <link rel="icon" type="image/png" href="./china-garden-logo-transparent.png">
 <title>Homepage</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- Unten jetzt werden Farben und so eingesetzt-->
  <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -37,8 +36,10 @@
   .nav-links a:hover { color: var(--gold); }
   .nav-cta { background: var(--red) !important; color: #fff !important; padding: 0.5rem 1.3rem; border: 1px solid var(--red-mid) !important; border-radius: 2px; }
   .nav-cta:hover { background: var(--red-mid) !important; }
+  .nav-takeaway { background: var(--gold) !important; color: var(--ink) !important; padding: 0.5rem 1.3rem; border: 1px solid var(--gold-light) !important; border-radius: 2px; font-weight: 500 !important; }
+  .nav-takeaway:hover { background: var(--gold-light) !important; }
 
-  /* Hauptteil - Schrift und so */
+  /* Hauptteil */
   .hero { min-height: 100vh; background: var(--ink); display: grid; grid-template-columns: 1fr; position: relative; overflow: hidden; background-image: url('./Restaurantbild.webp'); background-size: cover; background-position: center; }
   .hero-lattice { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.06; background-image: repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px), repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(196,154,42,1) 59px,rgba(196,154,42,1) 60px); }
   .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 10rem 4.5rem 6rem 7rem; position: relative; z-index: 3; background: rgba(30,10,13,0.5); border-radius: 4px; }
@@ -52,6 +53,8 @@
   .hero-actions { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
   .btn-primary { background: var(--red); color: #fff; padding: 0.9rem 2.2rem; text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; transition: all 0.2s; border: 1px solid var(--red-mid); display: inline-block; }
   .btn-primary:hover { background: var(--red-mid); transform: translateY(-1px); }
+  .btn-gold { background: var(--gold); color: var(--ink); padding: 0.9rem 2.2rem; text-decoration: none; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; transition: all 0.2s; border: 1px solid var(--gold-light); display: inline-block; }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
   .btn-ghost { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.6rem; transition: color 0.2s; }
   .btn-ghost:hover { color: var(--gold); }
   .btn-ghost::after { content: '→'; font-size: 1rem; }
@@ -79,8 +82,8 @@
   .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,rgba(196,154,42,0.5),transparent); animation:scrollPulse 2s ease-in-out infinite; }
   @keyframes scrollPulse{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(0.6);opacity:0.4}}
 
-  /* Buffet, Speisekarte und Partyservice Teil */
-  .quick-links { background: var(--red); display: grid; grid-template-columns: repeat(3,1fr); }
+  /* Quick Links */
+  .quick-links { background: var(--red); display: grid; grid-template-columns: repeat(4,1fr); }
   .quick-link { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5rem; padding:1.8rem 1rem; text-decoration:none; border-right:1px solid rgba(255,255,255,0.1); transition:background 0.2s; position:relative; overflow:hidden; }
   .quick-link:last-child { border-right:none; }
   .quick-link::before { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--gold); transform:scaleX(0); transition:transform 0.3s; }
@@ -89,6 +92,9 @@
   .quick-link-icon { font-size:1.5rem; }
   .quick-link-chin { font-family:'Noto Serif SC',serif; font-size:0.68rem; color:rgba(255,255,255,0.3); }
   .quick-link-label { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.8); font-weight:500; }
+  .quick-link-highlight { background: rgba(196,154,42,0.15); }
+  .quick-link-highlight .quick-link-label { color: var(--gold-pale); }
+  .quick-link-highlight::before { background: var(--gold-pale); }
 
   /* Trennwände */
   .chin-divider { display:flex; align-items:center; gap:1.5rem; margin:2.5rem 0; }
@@ -103,7 +109,7 @@
   .section-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); font-weight:400; line-height:1.15; color:var(--ink); }
   .section-title.light { color:#fff; }
 
-  /* Über uns Teil */
+  /* Über uns */
   .about { padding:8rem 7rem; background:var(--cream); display:grid; grid-template-columns:1fr 1fr; gap:7rem; align-items:center; position:relative; }
   .about::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 15px,var(--gold) 15px,var(--gold) 17px,var(--red) 17px,var(--red) 30px); }
   .about p { color:var(--mid); font-size:1rem; line-height:1.9; font-weight:300; margin-top:1.2rem; }
@@ -137,10 +143,12 @@
   .hours-table td:first-child { color:rgba(255,255,255,0.4); font-weight:300; }
   .hours-table td:last-child { color:#fff; text-align:right; font-family:'Playfair Display',serif; font-size:0.95rem; }
   .closed-badge { font-size:0.68rem; background:rgba(139,26,42,0.2); color:#E07080; padding:0.2rem 0.6rem; border-radius:2px; letter-spacing:0.08em; font-family:'DM Sans',sans-serif; }
-  .hours-cta { margin-top:2.5rem; }
+  .hours-cta { margin-top:2.5rem; display:flex; gap:1rem; flex-wrap:wrap; }
   .hours-cta a { display:inline-flex; align-items:center; gap:0.6rem; background:var(--red); color:#fff; text-decoration:none; padding:0.85rem 1.8rem; border-radius:2px; font-size:0.78rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:background 0.2s; border:1px solid var(--red-mid); }
   .hours-cta a:hover { background:var(--red-mid); }
   .hours-cta a::after { content:'→'; margin-left:0.3rem; }
+  .hours-cta a.gold-link { background:var(--gold); color:var(--ink); border-color:var(--gold-light); font-weight:600; }
+  .hours-cta a.gold-link:hover { background:var(--gold-light); }
 
   /* Fußzeile */
   footer { background:#0D0508; padding:4rem 7rem 2.5rem; display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:5rem; border-top:1px solid rgba(139,26,42,0.3); }
@@ -155,10 +163,11 @@
   .footer-col ul li { margin-bottom:0.7rem; }
   .footer-col ul li a { text-decoration:none; color:rgba(255,255,255,0.3); font-size:0.85rem; font-weight:300; transition:color 0.2s; }
   .footer-col ul li a:hover { color:var(--gold); }
+  .footer-col ul li a.footer-takeaway { color:var(--gold); opacity:0.7; }
+  .footer-col ul li a.footer-takeaway:hover { opacity:1; }
   .footer-bottom { background:#0D0508; padding:1.2rem 7rem; border-top:1px solid rgba(139,26,42,0.15); display:flex; justify-content:space-between; align-items:center; }
   .footer-bottom p { font-size:0.75rem; color:rgba(255,255,255,0.15); font-weight:300; }
 
-  
   @media (max-width:960px) {
     nav { padding:0.8rem 1.5rem; }
     .nav-links { display:none; }
@@ -168,7 +177,7 @@
     .hero-gradient-left { width:100%; background:linear-gradient(to right,var(--ink) 60%,transparent); }
     .hero-lanterns { display:none; }
     .scroll-hint { left:2rem; }
-    .quick-links { grid-template-columns:1fr; }
+    .quick-links { grid-template-columns:1fr 1fr; }
     .quick-link { border-bottom:1px solid rgba(255,255,255,0.1); }
     .about { grid-template-columns:1fr; gap:3.5rem; padding:5rem 2rem; }
     .hours-section { grid-template-columns:1fr; gap:3.5rem; padding:5rem 2rem; }
@@ -191,10 +200,10 @@
   <ul class="nav-links">
     <li><a href="#about">Über uns</a></li>
     <li><a href="#hours">Öffnungszeiten</a></li>
+    <li><a href="takeaway.html" class="nav-takeaway">🥡 Take-Away</a></li>
     <li><a href="kontakt.html" class="nav-cta">Reservieren</a></li>
   </ul>
 </nav>
-
 
 <section class="hero"> 
   <div class="hero-lattice"></div>
@@ -213,6 +222,7 @@
     <p class="hero-desc">Erleben Sie im China Garden die Vielfalt der traditionellen chinesischen Küche – frisch zubereitet, mit hochwertigen Zutaten und viel Liebe zum Detail. Von knusprigen Spezialitäten aus dem Wok bis hin zu aromatischen Klassikern für jeden Anlass.</p>
     <div class="hero-actions">
       <a href="speisekarte.html" class="btn-primary">Speisekarte ansehen</a>
+      <a href="takeaway.html" class="btn-gold">Takeaway bestellen</a>
       <a href="kontakt.html" class="btn-ghost">Tisch reservieren</a>
     </div>
   </div>
@@ -222,12 +232,17 @@
   </div>
 </section>
 
-<!-- Diese 3 Teile -->
+<!-- Quick Links -->
 <div class="quick-links">
   <a class="quick-link" href="speisekarte.html">
     <div class="quick-link-icon">🥢</div>
     <div class="quick-link-chin">菜单</div>
     <div class="quick-link-label">Speisekarte</div>
+  </a>
+  <a class="quick-link quick-link-highlight" href="takeaway.html">
+    <div class="quick-link-icon">🥡</div>
+    <div class="quick-link-chin">外卖</div>
+    <div class="quick-link-label">Take-Away</div>
   </a>
   <a class="quick-link" href="buffet_seite.html">
     <div class="quick-link-icon">🍜</div>
@@ -251,7 +266,6 @@
     <p>Ein besonderes Highlight ist unser Show-Cooking-Buffet – frisch, aromatisch und ganz nach Ihrem Geschmack. Mit Platz für bis zu 200 Gäste sind wir ideal für Familienfeiern, Geburtstage, Hochzeiten oder Firmenveranstaltungen.</p>
     <p>Wir freuen uns darauf, Sie bei uns begrüßen zu dürfen. <br><em style="color:var(--red);font-style:normal;">Ihr China Garden Team</em></p>
     <div class="chin-divider"><span>✦</span></div>
-
   </div>
   <div class="about-visual">
     <div class="about-logo-display">
@@ -277,6 +291,7 @@
     </div>
     <div class="hours-cta">
       <a href="kontakt.html">Tisch reservieren</a>
+      <a href="takeaway.html" class="gold-link">Online bestellen</a>
     </div>
   </div>
   <div>
@@ -305,6 +320,7 @@
     <ul>
       <li><a href="#about">Über uns</a></li>
       <li><a href="speisekarte.html">Speisekarte</a></li>
+      <li><a href="takeaway.html" class="footer-takeaway">Take-Away</a></li>
       <li><a href="buffet_seite.html">Buffet</a></li>
       <li><a href="party-service.html">Party-Service</a></li>
       <li><a href="#hours">Öffnungszeiten</a></li>
